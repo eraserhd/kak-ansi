@@ -81,3 +81,7 @@ are removed.} \
         update-option buffer ansi_color_ranges
     }
 }
+
+hook -group ansi global BufCreate '\*stdin\*' %{
+    hook -once buffer NormalIdle '' ansi-render
+}
