@@ -77,7 +77,7 @@ are removed.} \
                 printf "\n";
             }
         ' }
-        execute-keys '%s\x1B\[[\d;]+m<ret><a-d>'
+        try %{ execute-keys '%s\x1B\[[\d;]+m<ret><a-d>' }
         update-option buffer ansi_color_ranges
     }
 }
