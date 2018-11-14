@@ -1,15 +1,18 @@
 declare-option -hidden range-specs ansi_color_ranges
 
 define-command \
-    -docstring %{ansi-render: colorize buffer by using ANSI codes
+    -docstring %{ansi-render-selection: colorize ANSI codes contained inside selection
 
 After highlighters are added to colorize the buffer, the ANSI codes
 are removed.} \
     -params 0 \
-    ansi-render %{
-    try %{ add-highlighter buffer/ansi ranges ansi_color_ranges }
+    ansi-render-selection %{
     evaluate-commands -draft %{
-        execute-keys '%'
+        try %{
+            add-highlighter buffer/ansi ranges ansi_color_ranges
+            set-option buffer ansi_color_ranges %val{timestamp}
+        }
+        update-option buffer ansi_color_ranges
         evaluate-commands %sh{ exec awk '
             BEGIN{
                 COLORS[0] = "black";
@@ -22,12 +25,14 @@ are removed.} \
                 COLORS[7] = "white";
                 COLORS[9] = "default";
 
+                split(ENVIRON["kak_selection_desc"], selection_desc, /[.,]/);
+
                 # line, column             - position of this character.
                 # prev_line, prev_column   - position of previous character.
                 # start_line, start_column - starting position of current highlight.
-                prev_line = start_line = line = 1;
-                start_column = column = 1;
-                prev_column = 0;
+                prev_line = start_line = line = selection_desc[1];
+                start_column = column = selection_desc[2];
+                prev_column = column - 1;
             }
             function advance(ch) {
                 prev_line = line;
@@ -41,7 +46,7 @@ are removed.} \
             }
             BEGIN{
                 text = ENVIRON["kak_selection"];
-                printf "set-option buffer ansi_color_ranges %s", ENVIRON["kak_timestamp"];
+                printf "set-option -add buffer ansi_color_ranges";
                 foreground = "default";
                 background = "default";
                 attributes = "";
@@ -53,10 +58,14 @@ are removed.} \
                             (start_line != prev_line || prev_column >= start_column)) {
                             printf " %d.%d,%d.%d|%s", start_line, start_column, prev_line, prev_column, face;
                         }
-                        if (1 == match(substr(text, i, 35), /\x1B\[[0-9;]+m/)) {
+                        if (1 == match(substr(text, i, 35), /\x1B\[[0-9;]*m/)) {
                             start_line = line;
                             start_column = column + RLENGTH;
                             split(substr(text, i+2, RLENGTH-3), codes, /;/);
+                            if (length(codes) == 0) {
+                                foreground = background = "default";
+                                attributes = "";
+                            }
                             for (j = 1; j <= length(codes); j++) {
                                 code = 0 + codes[j];
                                 if (code == 0) {
@@ -77,9 +86,29 @@ are removed.} \
                 printf "\n";
             }
         ' }
-        try %{ execute-keys '%s\x1B\[[\d;]+m<ret><a-d>' }
+        try %{ execute-keys 's\x1B\[[\d;]*m<ret><a-d>' }
         update-option buffer ansi_color_ranges
     }
+}
+
+define-command \
+    -docstring %{ansi-render: colorize buffer by using ANSI codes
+
+After highlighters are added to colorize the buffer, the ANSI codes
+are removed.} \
+    -params 0 \
+    ansi-render %{
+    evaluate-commands -draft %{
+        execute-keys '%'
+        ansi-render-selection
+    }
+}
+
+define-command \
+    -docstring %{ansi-clear: clear highlighting for current buffer.} \
+    -params 0 \
+    ansi-clear %{
+        set buffer ansi_color_ranges
 }
 
 hook -group ansi global BufCreate '\*stdin\*' %{
