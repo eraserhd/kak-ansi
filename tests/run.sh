@@ -1,39 +1,46 @@
 #!/bin/sh
 
-compile() {
-    $CC -g -o kak-ansi-filter kak-ansi-filter.c
-    return $?
-}
+check() {
+    local in has_out=false out has_range=false range actual_out
+    local description="$1"
+    shift
+    while [ $# -ne 0 ]; do
+        case "$1" in
+            -in) shift; in="$1";;
+            -out) shift; has_out=true; out="$1";;
+            -range) shift; has_range=true; range="$1";;
+        esac
+        shift
+    done
 
-runTest() {
-    local test="$1"
-    printf ' %s ... ' "$1"
-    ./kak-ansi-filter 2>"$test/run-eval" <"$test/in" |od -c >"$test/run-out"
+    printf '%s ... ' "$description"
+
     local ok=true
-    if [ -f "$test/out" ] && ! diff -q "$test/run-out" "$test/out" >/dev/null 2>&1; then
-        printf '\e[31mfailed (out)\e[0m\n'
-        diff -u "$test/out" "$test/run-out"
+    local commands=$(mktemp)
+    actual_out=$(printf "$in" | ./kak-ansi-filter 2>"$commands")
+    printf ' ' >>"$commands"
+    if $has_out && [ "$out" != "$actual_out" ]; then
         ok=false
-    fi
-    if [ -f "$test/eval" ] && ! diff -q "$test/run-eval" "$test/eval" >/dev/null 2>&1; then
-        printf '\e[31mfailed (eval)\e[0m\n'
-        diff -u "$test/eval" "$test/run-eval"
+        printf '\e[31mfailed\e[0m\n'
+        printf '  Expected output: %s\n' "$out"
+        printf '  Actual output:   %s\n' "$actual_out"
+        printf '\n'
+    elif $has_range && ! grep -qF " $range" "$commands"; then 
         ok=false
+        printf '\e[31mfailed\e[0m\n'
+        printf '  Expected range: %s\n' "$range"
+        printf '  Commands were: %s\n' "$(cat "$commands")"
+        printf '\n'
     fi
+    rm -f "$commands"
     if $ok; then
         printf 'ok\n'
     fi
 }
 
-main() {
-    compile || return $?
-    local test
-    for test in tests/*; do
-        if ! [ -d "$test" ]; then
-            continue
-        fi
-        runTest "$test"
-    done
-}
+$CC -g -o kak-ansi-filter kak-ansi-filter.c || exit $?
 
-main "$@" || return $?
+check 'removes ANSI escapes'              -in ' \e[32m 1.\e[39m hello' -out '  1. hello'
+check 'adds ranges for foreground colors' -in ' \e[32m 1.\e[39m hello' -range '1.2,1.4|green'
+check 'adds ranges for background colors' -in ' \e[41m 1.\e[49m hello' -range '1.2,1.4|default,red'
+check '\e[0m resets foreground'           -in ' \e[32m 1.\e[0m hello'  -range '1.2,1.4|green'

@@ -88,7 +88,9 @@ void process_ansi_escape(wchar_t* seq)
     for (int i = 0; i < code_count; i++)
     {
         int code = codes[i];
-        if (code >= 30 && code <= 39)
+        if (code == 0)
+            current_attributes.foreground = DEFAULT;
+        else if (code >= 30 && code <= 39)
             current_attributes.foreground = code % 10;
         else if (code >= 40 && code <= 49)
             current_attributes.background = code % 10;
@@ -103,8 +105,8 @@ void process_ansi_escape(wchar_t* seq)
                  color_start_coord.line, color_start_coord.column,
                  previous_char_coord.line, previous_char_coord.column,
                  face);
-        color_start_coord = current_coord;
     }
+    color_start_coord = current_coord;
 }
 
 void process_escape_sequence(wchar_t* seq)
