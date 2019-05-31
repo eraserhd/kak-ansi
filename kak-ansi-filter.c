@@ -7,7 +7,17 @@
 
 #define DEFAULT 9
 
-static const wchar_t* COLORS[] = {
+typedef struct {
+    int line;
+    int column;
+} Coord;
+
+typedef struct {
+    int foreground;
+} Attributes;
+
+static const wchar_t* COLORS[] =
+{
     L"black",
     L"red",
     L"green",
@@ -20,17 +30,22 @@ static const wchar_t* COLORS[] = {
     L"default",
 };
 
-typedef struct {
-    int line;
-    int column;
-} Coord;
+static const Attributes NO_ATTRIBUTES =
+{
+    .foreground = DEFAULT
+};
 
-Coord   current_coord          = { .line = 1, .column = 1 };
-Coord   previous_char_coord    = { .line = 1, .column = 0 };
-Coord   color_start_coord      = { .line = 1, .column = 1 };
-int     foreground             = DEFAULT;
-wchar_t escape_sequence[1024];
-int     escape_sequence_length = 0;
+Coord      current_coord          = { .line = 1, .column = 1 };
+Coord      previous_char_coord    = { .line = 1, .column = 0 };
+Coord      color_start_coord      = { .line = 1, .column = 1 };
+Attributes current_attributes     = { .foreground = DEFAULT };
+wchar_t    escape_sequence[1024];
+int        escape_sequence_length = 0;
+
+bool attributes_equal(const Attributes* a, const Attributes* b)
+{
+    return a->foreground == b->foreground;
+}
 
 int parse_codes(const wchar_t* p, int* codes, int max_codes)
 {
@@ -52,7 +67,7 @@ int parse_codes(const wchar_t* p, int* codes, int max_codes)
 void process_ansi_escape(wchar_t* seq)
 {
     int codes[512];
-    int prev_foreground = foreground;
+    Attributes previous_attributes = current_attributes;
     int code_count = parse_codes(seq, codes, sizeof(codes)/sizeof(codes[0]));
 
     for (int i = 0; i < code_count; i++)
@@ -60,16 +75,17 @@ void process_ansi_escape(wchar_t* seq)
         int code = codes[i];
         if (code >= 30 && code <= 39)
         {
-            foreground = code % 10;
+            current_attributes.foreground = code % 10;
         }
     }
 
-    if (prev_foreground != foreground && prev_foreground != DEFAULT)
+    if (!attributes_equal(&previous_attributes, &current_attributes) &&
+        !attributes_equal(&previous_attributes, &NO_ATTRIBUTES))
     {
         fwprintf(stderr, L" %d.%d,%d.%d|%ls",
                  color_start_coord.line, color_start_coord.column,
                  previous_char_coord.line, previous_char_coord.column,
-                 COLORS[prev_foreground]);
+                 COLORS[previous_attributes.foreground]);
         color_start_coord = current_coord;
     }
 }
