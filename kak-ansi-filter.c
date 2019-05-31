@@ -20,13 +20,15 @@ static const wchar_t* COLORS[] = {
     L"default",
 };
 
-int     line = 1;
-int     column = 1;
-int     last_line = 1;
-int     last_column = 0;
-int     foreground = DEFAULT;
-int     start_line = 1;
-int     start_column = 1;
+typedef struct {
+    int line;
+    int column;
+} Coord;
+
+Coord   current_coord          = { .line = 1, .column = 1 };
+Coord   previous_char_coord    = { .line = 1, .column = 0 };
+Coord   color_start_coord      = { .line = 1, .column = 1 };
+int     foreground             = DEFAULT;
 wchar_t escape_sequence[1024];
 int     escape_sequence_length = 0;
 
@@ -64,9 +66,11 @@ void process_ansi_escape(wchar_t* seq)
 
     if (prev_foreground != foreground && prev_foreground != DEFAULT)
     {
-        fwprintf(stderr, L" %d.%d,%d.%d|%ls", start_line, start_column, last_line, last_column, COLORS[prev_foreground]);
-        start_line = line;
-        start_column = column;
+        fwprintf(stderr, L" %d.%d,%d.%d|%ls",
+                 color_start_coord.line, color_start_coord.column,
+                 previous_char_coord.line, previous_char_coord.column,
+                 COLORS[prev_foreground]);
+        color_start_coord = current_coord;
     }
 }
 
@@ -116,15 +120,14 @@ bool handle_escape_char(wchar_t ch)
 void display_char(wchar_t ch)
 {
     putwchar(ch);
-    last_line = line;
-    last_column = column;
+    previous_char_coord = current_coord;
     if (ch == L'\n')
     {
-        ++line;
-        column = 1;
+        ++current_coord.line;
+        current_coord.column = 1;
     }
     else
-        ++column;
+        ++current_coord.column;
 }
 
 int main(int argc, char* argv[])
