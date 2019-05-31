@@ -30,23 +30,35 @@ int     start_column = 1;
 wchar_t escape_sequence[1024];
 int     escape_sequence_length = 0;
 
-void process_ansi_escape(wchar_t* seq)
+int parse_codes(const wchar_t* p, int* codes, int max_codes)
 {
-    int prev_foreground = foreground;
-
-    for (wchar_t* p = seq; *p; p++)
+    int count = 0;
+    for (; *p && count < max_codes; p++)
     {
         if (!iswdigit(p[0]) && iswdigit(p[1]))
         {
-            int code = -1;
-            swscanf(p + 1, L"%d", &code);
-            if (code == -1)
+            codes[count] = -1;
+            swscanf(p + 1, L"%d", &codes[count]);
+            if (codes[count] == -1)
                 continue;
+            ++count;
+        }
+    }
+    return count;
+}
 
-            if (code >= 30 && code <= 39)
-            {
-                foreground = code % 10;
-            }
+void process_ansi_escape(wchar_t* seq)
+{
+    int codes[512];
+    int prev_foreground = foreground;
+    int code_count = parse_codes(seq, codes, sizeof(codes)/sizeof(codes[0]));
+
+    for (int i = 0; i < code_count; i++)
+    {
+        int code = codes[i];
+        if (code >= 30 && code <= 39)
+        {
+            foreground = code % 10;
         }
     }
 
@@ -127,7 +139,6 @@ int main(int argc, char* argv[])
     {
         if (handle_escape_char(ch))
             continue;
-
         display_char(ch);
     }
 
