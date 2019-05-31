@@ -89,7 +89,10 @@ void process_ansi_escape(wchar_t* seq)
     {
         int code = codes[i];
         if (code == 0)
+        {
             current_attributes.foreground = DEFAULT;
+            current_attributes.background = DEFAULT;
+        }
         else if (code >= 30 && code <= 39)
             current_attributes.foreground = code % 10;
         else if (code >= 40 && code <= 49)
