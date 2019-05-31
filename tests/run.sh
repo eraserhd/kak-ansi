@@ -45,3 +45,5 @@ check 'adds ranges for foreground colors' -in ' \e[32m 1.\e[39m hello' -range '1
 check 'adds ranges for background colors' -in ' \e[41m 1.\e[49m hello' -range '1.2,1.4|default,red'
 check '\e[0m resets foreground'           -in ' \e[32m 1.\e[0m hello'  -range '1.2,1.4|green'
 check '\e[0m resets background'           -in ' \e[42m 1.\e[0m hello'  -range '1.2,1.4|default,green'
+check '\e[m resets foreground'            -in ' \e[32m 1.\e[m hello'   -range '1.2,1.4|green'
+check '\e[m resets background'            -in ' \e[42m 1.\e[m hello'   -range '1.2,1.4|default,green'

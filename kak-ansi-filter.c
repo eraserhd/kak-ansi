@@ -98,6 +98,11 @@ void process_ansi_escape(wchar_t* seq)
         else if (code >= 40 && code <= 49)
             current_attributes.background = code % 10;
     }
+    if (code_count == 0)
+    {
+        current_attributes.foreground = DEFAULT;
+        current_attributes.background = DEFAULT;
+    }
 
     if (!attributes_equal(&previous_attributes, &current_attributes) &&
         !attributes_equal(&previous_attributes, &NO_ATTRIBUTES))
