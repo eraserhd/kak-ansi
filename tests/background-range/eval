@@ -1,0 +1,1 @@
+set-option -add buffer ansi_color_ranges 1.1,1.3|default,red
