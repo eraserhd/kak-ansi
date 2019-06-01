@@ -119,14 +119,18 @@ void process_ansi_escape(wchar_t* seq)
     for (int i = 0; i < code_count; i++)
     {
         int code = codes[i];
-        if (code == 0)
-            reset();
-        else if (code == 1)
-            current_face.attributes |= BOLD;
-        else if (code >= 30 && code <= 39)
-            current_face.foreground = code % 10;
-        else if (code >= 40 && code <= 49)
-            current_face.background = code % 10;
+        switch (code)
+        {
+        case 0:  reset();                          break;
+        case 1:  current_face.attributes |= BOLD;  break;
+        case 21: current_face.attributes &= ~BOLD; break;
+        default:
+            if (code >= 30 && code <= 39)
+                current_face.foreground = code % 10;
+            else if (code >= 40 && code <= 49)
+                current_face.background = code % 10;
+            break;
+        }
     }
     if (code_count == 0)
         reset();
