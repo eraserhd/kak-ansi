@@ -1,6 +1,8 @@
 TEST_COUNT=0
 TESTS_FAILED=0
 TEST_OK=true
+TEST_OUTPUT=''
+TEST_COMMANDS=()
 
 h2() {
     printf '\n \e[33;1m%s\e[0m\n' "$1"
@@ -28,6 +30,10 @@ fail() {
         printf '\e[31;1mfailed\e[0m\n'
     fi
     TEST_OK=false
+    printf '      Assertion: \e[31m%s\e[0m\n' "$*"
+    printf "         Output: '%s'\n" "$TEST_OUT"
+    printf "       Commands: '%s'\n" "${TEST_COMMANDS[*]}"
+    printf '\n'
 }
 
 t() {
@@ -36,9 +42,8 @@ t() {
     shift 3
     printf '   %s ... ' "$description"
     local commands_file=$(mktemp)
-    local actual_out=$(printf "$in" | ./kak-ansi-filter 2>"$commands_file")
-    local actual_commands=()
-    read -ra actual_commands <"$commands_file"
+    TEST_OUT=$(printf "$in" | ./kak-ansi-filter 2>"$commands_file")
+    read -ra TEST_COMMANDS <"$commands_file"
     rm -f "$commands_file"
 
     TEST_OK=true
@@ -46,48 +51,34 @@ t() {
     while (( $# > 0 )); do
         case "$1" in
         -out)
-            shift
-            local out="$1"
-            if [[ $out != $actual_out ]]; then
-                fail
-                printf '      Expected output: %s\n' "$out"
-                printf '        Actual output: %s\n' "$actual_out"
-                printf '\n'
+            if [[ $2 != $TEST_OUT ]]; then
+                fail "$1" "$2"
             fi
+            shift 2
             ;;
         -range)
-            shift
-            if ! hasGlob "$1" "${actual_commands[@]}"; then
-                fail
-                printf '      Expected range: %s\n' "$1"
-                printf '       Commands were: %s\n' "${actual_commands[*]}"
-                printf '\n'
+            if ! hasGlob "$2" "${TEST_COMMANDS[@]}"; then
+                fail "$1" "$2"
             fi
+            shift 2
             ;;
         -no-range)
-            shift
-            if hasGlob "$1" "${actual_commands[@]}"; then
-                fail
-                printf '    Unexpected range: %s\n' "$1"
-                printf '       Commands were: %s\n' "${actual_commands[*]}"
-                printf '\n'
+            if hasGlob "$2" "${TEST_COMMANDS[@]}"; then
+                fail "$1" "$2"
             fi
+            shift 2
             ;;
         -no-ranges)
-            if hasGlob "*|*" "${actual_commands[@]}"; then
-                fail
-                printf '      Expected no ranges.\n'
-                printf '      Commands were: %s\n' "${actual_commands[*]}"
-                printf '\n'
+            if hasGlob "*|*" "${TEST_COMMANDS[@]}"; then
+                fail "$1"
             fi
+            shift
             ;;
         *)
-            fail
-            printf '     Invalid option %s.\n' "$1"
-            printf '\n'
+            fail "$1"
+            shift
             ;;
         esac
-        shift
     done
 
     TEST_COUNT=$(( TEST_COUNT + 1 ))
