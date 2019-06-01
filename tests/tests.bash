@@ -41,7 +41,7 @@ t '\e[m resets bg' -in ' \e[42m 1.\e[m hello'   -range '1.2,1.4|default,green'
 #t 'can set palette colors'
 
 h2 "Attributes"
-#t '\e[1m sets bold'
+t '\e[1m sets bold' -in 'x\e[1mxx' -range '1.2,1.3|default+b'
 #t '\e[2m sets dim'
 #t '\e[3m sets italic'
 #t '\e[4m sets underline'

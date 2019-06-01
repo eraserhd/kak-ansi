@@ -15,6 +15,7 @@ hasGlob() {
     pattern="${pattern//\*/.*}"
     pattern="${pattern//\|/\\|}"
     pattern="${pattern//\?/.}"
+    pattern="${pattern//\+/\\+}"
     pattern="^${pattern}$"
     local word
     for word in "$@"; do

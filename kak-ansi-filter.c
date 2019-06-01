@@ -12,9 +12,14 @@ typedef struct {
     int column;
 } Coord;
 
+typedef enum {
+    BOLD = 0x01
+} Attributes;
+
 typedef struct {
     int foreground;
     int background;
+    Attributes attributes;
 } Face;
 
 static const wchar_t* COLORS[] =
@@ -34,13 +39,15 @@ static const wchar_t* COLORS[] =
 static const Face DEFAULT_FACE =
 {
     .foreground = DEFAULT,
-    .background = DEFAULT
+    .background = DEFAULT,
+    .attributes = 0
 };
 
 Face current_face =
 {
     .foreground = DEFAULT,
-    .background = DEFAULT
+    .background = DEFAULT,
+    .attributes = 0
 };
 
 Coord      current_coord       = { .line = 1, .column = 1 };
@@ -51,7 +58,8 @@ int        escape_sequence_length = 0;
 
 bool faces_equal(const Face* a, const Face* b)
 {
-    return a->foreground == b->foreground && a->background == b->background;
+    return a->foreground == b->foreground && a->background == b->background &&
+        a->attributes == b->attributes;
 }
 
 int parse_codes(const wchar_t* p, int* codes, int max_codes)
@@ -73,10 +81,15 @@ int parse_codes(const wchar_t* p, int* codes, int max_codes)
 
 void format_face(wchar_t* s, size_t size, const Face* face)
 {
+    wchar_t attrs[64] = L"";
+    if (face->attributes != 0)
+        wcscpy(attrs, L"+");
+    if (face->attributes & BOLD)
+        wcscat(attrs, L"b");
     if (face->background == DEFAULT)
-        swprintf(s, size, L"%ls", COLORS[face->foreground]);
+        swprintf(s, size, L"%ls%ls", COLORS[face->foreground], attrs);
     else
-        swprintf(s, size, L"%ls,%ls", COLORS[face->foreground], COLORS[face->background]);
+        swprintf(s, size, L"%ls,%ls%ls", COLORS[face->foreground], COLORS[face->background], attrs);
 }
 
 void reset(void)
@@ -108,6 +121,8 @@ void process_ansi_escape(wchar_t* seq)
         int code = codes[i];
         if (code == 0)
             reset();
+        else if (code == 1)
+            current_face.attributes |= BOLD;
         else if (code >= 30 && code <= 39)
             current_face.foreground = code % 10;
         else if (code >= 40 && code <= 49)
