@@ -8,6 +8,7 @@ h2() {
 hasGlob() {
     local pattern="$1"
     shift
+    pattern="${pattern//\./\\.}"
     pattern="${pattern//\*/.*}"
     pattern="${pattern//\|/\\|}"
     pattern="${pattern//\?/.}"
@@ -53,7 +54,19 @@ t() {
                     printf '\e[31mfailed\e[0m\n'
                 fi
                 ok=false
-                printf '      Expected range: %s\n' "$range"
+                printf '      Expected range: %s\n' "$1"
+                printf '       Commands were: %s\n' "${actual_commands[*]}"
+                printf '\n'
+            fi
+            ;;
+        -no-range)
+            shift
+            if hasGlob "$1" "${actual_commands[@]}"; then
+                if $ok; then
+                    printf '\e[31mfailed\e[0m\n'
+                fi
+                ok=false
+                printf '    Unexpected range: %s\n' "$1"
                 printf '       Commands were: %s\n' "${actual_commands[*]}"
                 printf '\n'
             fi
@@ -70,7 +83,12 @@ t() {
             fi
             ;;
         *)
+            if $ok; then
+                printf '\e[31mfailed\e[0m\n'
+            fi
             ok=false
+            printf '     Invalid option %s.\n' "$1"
+            printf '\n'
             ;;
         esac
         shift

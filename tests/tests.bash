@@ -10,15 +10,15 @@ t 'removes ANSI escapes' -in ' \e[32m 1.\e[39m hello' -out '  1. hello'
 #t 'removes trailing spaces'
 
 h2 "Computing Ranges"
-t 'emits face at EOF' -in '\e[32mxxx' -range '1.1,1.3|green'
+t 'emits face at EOF' -in '\e[32mxxx' -range '1.1,1.3|*'
 t 'does not emit default face' -in '\e[39mxxx' -no-ranges
 #t 'emits face with fg'
 #t 'emits face with bg'
 #t 'emits face with attrs'
-t 'new face for fg change' -in '\e[32mxxx\e[31myyy' -range '1.1,1.3|green' -range '1.4,1.6|red'
-t 'new face for bg change' -in '\e[45mxxx\e[41myyy' -range '1.1,1.3|default,magenta' -range '1.4,1.6|default,red'
+t 'new face for fg change' -in '\e[32mxxx\e[31myyy' -range '1.1,1.3|*' -range '1.4,1.6|*'
+t 'new face for bg change' -in '\e[45mxxx\e[41myyy' -range '1.1,1.3|*' -range '1.4,1.6|*'
 #t 'new face for attr change'
-t 'no new face if no change' -in '\e[31mxxx\e[31myyy' -range '1.1,1.6|red'
+t 'no new face if no change' -in '\e[31mxxx\e[31myyy' -range '1.1,1.6|*' -no-range '1.4,1.6|*'
 #t 'handles change at 2.1'
 #t 'handles change at EOL'
 
