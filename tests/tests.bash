@@ -2,7 +2,7 @@
 source tests/functions.bash
 
 h2 "Fixing Output"
-t 'removes ANSI escapes'              -in ' \e[32m 1.\e[39m hello' -out '  1. hello'
+t 'removes ANSI escapes' -in ' \e[32m 1.\e[39m hello' -out '  1. hello'
 #t '\e(0 selects line-drawing'
 #t '\e(B resets line-drawing'
 #t 'ASCII SO selects line-drawing'
@@ -32,10 +32,10 @@ t '\e[m resets fg' -in ' \e[32m 1.\e[m hello' -range '1.2,1.4|green'
 #t 'can set palette colors'
 
 h2 "Background Color"
-t 'adds ranges for bg colors' -in ' \e[41m 1.\e[49m hello' -range '1.2,1.4|default,red'
-t '\e[0m resets bg'           -in ' \e[42m 1.\e[0m hello'  -range '1.2,1.4|default,green'
-t '\e[m resets bg'            -in ' \e[42m 1.\e[m hello'   -range '1.2,1.4|default,green'
-#t '\e[49m resets bg'
+t 'adds ranges for bg colors' -in ' \e[41m 1.' -range '1.2,1.4|default,red'
+t '\e[49m resets bg' -in ' \e[41m 1.\e[49mx' -range '1.2,1.4|default,red'
+t '\e[0m resets bg' -in ' \e[42m 1.\e[0m hello'  -range '1.2,1.4|default,green'
+t '\e[m resets bg' -in ' \e[42m 1.\e[m hello'   -range '1.2,1.4|default,green'
 #t '\e[48;5;0-7m sets bg palette'
 #t '\e[48;5;8-15m sets bg palette'
 #t '\e[48;5;Nm sets bg color'
