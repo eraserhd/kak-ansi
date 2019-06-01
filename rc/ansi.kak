@@ -40,7 +40,7 @@ define-command \
     -docstring %{ansi-clear: clear highlighting for current buffer.} \
     -params 0 \
     ansi-clear %{
-        set buffer ansi_color_ranges
+    set-option buffer ansi_color_ranges %val{timestamp}
 }
 
 hook -group ansi global BufCreate '\*stdin\*' %{
