@@ -1,5 +1,6 @@
 TEST_COUNT=0
 TESTS_FAILED=0
+TEST_OK=true
 
 h2() {
     printf '\n \e[33;1m%s\e[0m\n' "$1"
@@ -27,12 +28,13 @@ t() {
     local in="$3"
     shift 3
     printf '   %s ... ' "$description"
-    local ok=true
     local commands_file=$(mktemp)
     local actual_out=$(printf "$in" | ./kak-ansi-filter 2>"$commands_file")
     local actual_commands=()
     read -ra actual_commands <"$commands_file"
     rm -f "$commands_file"
+
+    TEST_OK=true
 
     while (( $# > 0 )); do
         case "$1" in
@@ -40,7 +42,7 @@ t() {
             shift
             local out="$1"
             if [[ $out != $actual_out ]]; then
-                ok=false
+                TEST_OK=false
                 printf '\e[31mfailed\e[0m\n'
                 printf '      Expected output: %s\n' "$out"
                 printf '        Actual output: %s\n' "$actual_out"
@@ -50,10 +52,10 @@ t() {
         -range)
             shift
             if ! hasGlob "$1" "${actual_commands[@]}"; then
-                if $ok; then
+                if $TEST_OK; then
                     printf '\e[31mfailed\e[0m\n'
                 fi
-                ok=false
+                TEST_OK=false
                 printf '      Expected range: %s\n' "$1"
                 printf '       Commands were: %s\n' "${actual_commands[*]}"
                 printf '\n'
@@ -62,10 +64,10 @@ t() {
         -no-range)
             shift
             if hasGlob "$1" "${actual_commands[@]}"; then
-                if $ok; then
+                if $TEST_OK; then
                     printf '\e[31mfailed\e[0m\n'
                 fi
-                ok=false
+                TEST_OK=false
                 printf '    Unexpected range: %s\n' "$1"
                 printf '       Commands were: %s\n' "${actual_commands[*]}"
                 printf '\n'
@@ -73,20 +75,20 @@ t() {
             ;;
         -no-ranges)
             if hasGlob "*|*" "${actual_commands[@]}"; then
-                if $ok; then
+                if $TEST_OK; then
                     printf '\e[31mfailed\e[0m\n'
                 fi
-                ok=false
+                TEST_OK=false
                 printf '      Expected no ranges.\n'
                 printf '      Commands were: %s\n' "${actual_commands[*]}"
                 printf '\n'
             fi
             ;;
         *)
-            if $ok; then
+            if $TEST_OK; then
                 printf '\e[31mfailed\e[0m\n'
             fi
-            ok=false
+            TEST_OK=false
             printf '     Invalid option %s.\n' "$1"
             printf '\n'
             ;;
@@ -95,7 +97,7 @@ t() {
     done
 
     TEST_COUNT=$(( TEST_COUNT + 1 ))
-    if $ok; then
+    if $TEST_OK; then
         printf 'ok\n'
     else
         TESTS_FAILED=$(( TESTS_FAILED + 1 ))
