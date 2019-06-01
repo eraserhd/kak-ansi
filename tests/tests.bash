@@ -10,7 +10,7 @@ t 'removes ANSI escapes'              -in ' \e[32m 1.\e[39m hello' -out '  1. he
 #t 'removes trailing spaces'
 
 h2 "Computing Ranges"
-#t 'emits face at EOF'
+t 'emits face at EOF' -in '\e[32mxxx' -range '1.1,1.3|green'
 #t 'does not emit default face'
 #t 'emits face with fg'
 #t 'emits face with bg'

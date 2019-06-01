@@ -25,14 +25,14 @@ t() {
     if $has_out && [[ $out != $actual_out ]]; then
         ok=false
         printf '\e[31mfailed\e[0m\n'
-        printf '  Expected output: %s\n' "$out"
-        printf '  Actual output:   %s\n' "$actual_out"
+        printf '      Expected output: %s\n' "$out"
+        printf '        Actual output: %s\n' "$actual_out"
         printf '\n'
     elif $has_range && ! grep -qF " $range" "$commands"; then 
         ok=false
         printf '\e[31mfailed\e[0m\n'
-        printf '  Expected range: %s\n' "$range"
-        printf '  Commands were: %s\n' "$(cat "$commands")"
+        printf '      Expected range: %s\n' "$range"
+        printf '       Commands were: %s\n' "$(cat "$commands")"
         printf '\n'
     fi
     rm -f "$commands"

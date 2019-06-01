@@ -85,6 +85,16 @@ void reset(void)
     current_face.background = DEFAULT;
 }
 
+void emit_face(Face* face)
+{
+    wchar_t facename[128];
+    format_face(facename, 127, face);
+    fwprintf(stderr, L" %d.%d,%d.%d|%ls",
+             face_start_coord.line, face_start_coord.column,
+             previous_char_coord.line, previous_char_coord.column,
+             facename);
+}
+
 void process_ansi_escape(wchar_t* seq)
 {
     int codes[512];
@@ -106,14 +116,7 @@ void process_ansi_escape(wchar_t* seq)
 
     if (!faces_equal(&previous_face, &current_face) &&
         !faces_equal(&previous_face, &DEFAULT_FACE))
-    {
-        wchar_t face[128];
-        format_face(face, 127, &previous_face);
-        fwprintf(stderr, L" %d.%d,%d.%d|%ls",
-                 face_start_coord.line, face_start_coord.column,
-                 previous_char_coord.line, previous_char_coord.column,
-                 face);
-    }
+        emit_face(&previous_face);
     face_start_coord = current_coord;
 }
 
@@ -180,14 +183,13 @@ int main(int argc, char* argv[])
     setlocale(LC_ALL, "en_US.utf8");
 
     fwprintf(stderr, L"set-option -add buffer ansi_color_ranges");
-
     while ((ch = fgetwc(stdin)) != WEOF)
     {
         if (handle_escape_char(ch))
             continue;
         display_char(ch);
     }
-
+    emit_face(&current_face);
     fwprintf(stderr, L"\n");
     exit(0);
 }
