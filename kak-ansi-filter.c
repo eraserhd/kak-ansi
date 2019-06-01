@@ -88,6 +88,8 @@ void reset(void)
 void emit_face(Face* face)
 {
     wchar_t facename[128];
+    if (faces_equal(face, &DEFAULT_FACE))
+        return;
     format_face(facename, 127, face);
     fwprintf(stderr, L" %d.%d,%d.%d|%ls",
              face_start_coord.line, face_start_coord.column,
@@ -114,10 +116,11 @@ void process_ansi_escape(wchar_t* seq)
     if (code_count == 0)
         reset();
 
-    if (!faces_equal(&previous_face, &current_face) &&
-        !faces_equal(&previous_face, &DEFAULT_FACE))
+   if (!faces_equal(&previous_face, &current_face))
+   {
         emit_face(&previous_face);
-    face_start_coord = current_coord;
+        face_start_coord = current_coord;
+    }
 }
 
 void process_escape_sequence(wchar_t* seq)
