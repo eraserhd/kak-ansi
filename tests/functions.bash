@@ -1,3 +1,7 @@
+h2() {
+    printf '\n \e[33;1m%s\e[0m\n' "$1"
+}
+
 t() {
     local in
     local has_out=false out
@@ -13,7 +17,7 @@ t() {
         shift
     done
 
-    printf '%s ... ' "$description"
+    printf '   %s ... ' "$description"
 
     local ok=true
     local commands=$(mktemp)

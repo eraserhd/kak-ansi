@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 source tests/functions.bash
 
-#group "Fixing Output"
+h2 "Fixing Output"
 t 'removes ANSI escapes'              -in ' \e[32m 1.\e[39m hello' -out '  1. hello'
 #t '\e(0 selects line-drawing'
 #t '\e(B resets line-drawing'
@@ -9,7 +9,7 @@ t 'removes ANSI escapes'              -in ' \e[32m 1.\e[39m hello' -out '  1. he
 #t 'ASCII SI resets line-drawing'
 #t 'removes trailing spaces'
 
-#group "Computing Ranges"
+h2 "Computing Ranges"
 #t 'emits face at EOF'
 #t 'does not emit default face'
 #t 'emits face with fg'
@@ -22,7 +22,7 @@ t 'removes ANSI escapes'              -in ' \e[32m 1.\e[39m hello' -out '  1. he
 #t 'handles change at 2.1'
 #t 'handles change at EOL'
 
-#group "Foreground Color"
+h2 "Foreground Color"
 t 'adds ranges for fg colors' -in ' \e[32m 1.\e[39m hello' -range '1.2,1.4|green'
 t '\e[0m resets fg'           -in ' \e[32m 1.\e[0m hello'  -range '1.2,1.4|green'
 t '\e[m resets fg'            -in ' \e[32m 1.\e[m hello'   -range '1.2,1.4|green'
@@ -31,7 +31,7 @@ t '\e[m resets fg'            -in ' \e[32m 1.\e[m hello'   -range '1.2,1.4|green
 #t '\e[38;2;r;g;bm sets true fg'
 #t 'can set palette colors'
 
-#group "Background Color"
+h2 "Background Color"
 t 'adds ranges for bg colors' -in ' \e[41m 1.\e[49m hello' -range '1.2,1.4|default,red'
 t '\e[0m resets bg'           -in ' \e[42m 1.\e[0m hello'  -range '1.2,1.4|default,green'
 t '\e[m resets bg'            -in ' \e[42m 1.\e[m hello'   -range '1.2,1.4|default,green'
@@ -43,7 +43,7 @@ t '\e[m resets bg'            -in ' \e[42m 1.\e[m hello'   -range '1.2,1.4|defau
 #t '\e[48;2;r;g;bm sets true bg'
 #t 'can set palette colors'
 
-#group "Attributes"
+h2 "Attributes"
 #t '\e[1m sets bold'
 #t '\e[2m sets dim'
 #t '\e[3m sets italic'
