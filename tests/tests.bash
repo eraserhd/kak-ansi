@@ -57,3 +57,5 @@ h2 "Attributes"
 #t '\e[25m resets blink'
 #t '\e[27m resets inverse'
 #t '\e[0m resets all attributes'
+
+summarize

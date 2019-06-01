@@ -1,3 +1,6 @@
+TEST_COUNT=0
+TESTS_FAILED=0
+
 h2() {
     printf '\n \e[33;1m%s\e[0m\n' "$1"
 }
@@ -41,9 +44,20 @@ t() {
         fi
     done
     rm -f "$commands"
+    TEST_COUNT=$(( TEST_COUNT + 1 ))
     if $ok; then
         printf 'ok\n'
+    else
+        TESTS_FAILED=$(( TESTS_FAILED + 1 ))
     fi
+}
+
+summarize() {
+    local color=''
+    if (( TESTS_FAILED > 0 )); then
+        color="$(printf '\e[31;1m')"
+    fi
+    printf '\n%s%d tests, %d failed.\e[0m\n' "$color" $TEST_COUNT $TESTS_FAILED
 }
 
 $CC -g -o kak-ansi-filter kak-ansi-filter.c || exit $?
