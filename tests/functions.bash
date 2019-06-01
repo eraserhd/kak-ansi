@@ -23,6 +23,13 @@ hasGlob() {
     return 1
 }
 
+fail() {
+    if $TEST_OK; then
+        printf '\e[31;1mfailed\e[0m\n'
+    fi
+    TEST_OK=false
+}
+
 t() {
     local description="$1"
     local in="$3"
@@ -42,8 +49,7 @@ t() {
             shift
             local out="$1"
             if [[ $out != $actual_out ]]; then
-                TEST_OK=false
-                printf '\e[31mfailed\e[0m\n'
+                fail
                 printf '      Expected output: %s\n' "$out"
                 printf '        Actual output: %s\n' "$actual_out"
                 printf '\n'
@@ -52,10 +58,7 @@ t() {
         -range)
             shift
             if ! hasGlob "$1" "${actual_commands[@]}"; then
-                if $TEST_OK; then
-                    printf '\e[31mfailed\e[0m\n'
-                fi
-                TEST_OK=false
+                fail
                 printf '      Expected range: %s\n' "$1"
                 printf '       Commands were: %s\n' "${actual_commands[*]}"
                 printf '\n'
@@ -64,10 +67,7 @@ t() {
         -no-range)
             shift
             if hasGlob "$1" "${actual_commands[@]}"; then
-                if $TEST_OK; then
-                    printf '\e[31mfailed\e[0m\n'
-                fi
-                TEST_OK=false
+                fail
                 printf '    Unexpected range: %s\n' "$1"
                 printf '       Commands were: %s\n' "${actual_commands[*]}"
                 printf '\n'
@@ -75,20 +75,14 @@ t() {
             ;;
         -no-ranges)
             if hasGlob "*|*" "${actual_commands[@]}"; then
-                if $TEST_OK; then
-                    printf '\e[31mfailed\e[0m\n'
-                fi
-                TEST_OK=false
+                fail
                 printf '      Expected no ranges.\n'
                 printf '      Commands were: %s\n' "${actual_commands[*]}"
                 printf '\n'
             fi
             ;;
         *)
-            if $TEST_OK; then
-                printf '\e[31mfailed\e[0m\n'
-            fi
-            TEST_OK=false
+            fail
             printf '     Invalid option %s.\n' "$1"
             printf '\n'
             ;;
