@@ -13,7 +13,8 @@ typedef struct {
 } Coord;
 
 typedef enum {
-    BOLD = 0x01
+    BOLD = 0x01,
+    DIM  = 0x02,
 } Attributes;
 
 typedef struct {
@@ -86,6 +87,8 @@ void format_face(wchar_t* s, size_t size, const Face* face)
         wcscpy(attrs, L"+");
     if (face->attributes & BOLD)
         wcscat(attrs, L"b");
+    if (face->attributes & DIM)
+        wcscat(attrs, L"d");
     if (face->background == DEFAULT)
         swprintf(s, size, L"%ls%ls", COLORS[face->foreground], attrs);
     else
@@ -127,6 +130,9 @@ void process_ansi_escape(wchar_t* seq)
             break;
         case 1:
             current_face.attributes |= BOLD;
+            break;
+        case 2:
+            current_face.attributes |= DIM;
             break;
         case 21:
             current_face.attributes &= ~BOLD;
