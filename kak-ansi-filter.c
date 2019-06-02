@@ -151,6 +151,25 @@ void emit_face(Face* face)
              facename);
 }
 
+int parse_extended_color(int* codes, int code_count, int *i)
+{
+    if (*i >= code_count)
+        return DEFAULT;
+    switch (codes[(*i)++])
+    {
+    case 2:
+        {
+            int r, g, b;
+            if (*i+3 > code_count) break;
+            r = codes[(*i)++];
+            g = codes[(*i)++];
+            b = codes[(*i)++];
+            return RGB(r,g,b);
+        }
+    }
+    return DEFAULT;
+}
+
 void process_ansi_escape(wchar_t* seq)
 {
     int codes[512];
@@ -194,22 +213,7 @@ void process_ansi_escape(wchar_t* seq)
             current_face.foreground = code % 10;
             break;
         case 38:
-            {
-                if (i >= code_count) break;
-                switch (codes[i++])
-                {
-                case 2:
-                    {
-                        int r, g, b;
-                        if (i+3 > code_count) break;
-                        r = codes[i++];
-                        g = codes[i++];
-                        b = codes[i++];
-                        current_face.foreground = RGB(r,g,b);
-                    }
-                    break;
-                }
-            }
+            current_face.foreground = parse_extended_color(codes, code_count, &i);
             break;
         case 39:
             current_face.foreground = DEFAULT;
@@ -225,22 +229,7 @@ void process_ansi_escape(wchar_t* seq)
             current_face.background = code % 10;
             break;
         case 48:
-            {
-                if (i >= code_count) break;
-                switch (codes[i++])
-                {
-                case 2:
-                    {
-                        int r, g, b;
-                        if (i+3 > code_count) break;
-                        r = codes[i++];
-                        g = codes[i++];
-                        b = codes[i++];
-                        current_face.background = RGB(r,g,b);
-                    }
-                    break;
-                }
-            }
+            current_face.background = parse_extended_color(codes, code_count, &i);
             break;
         case 49:
             current_face.background = DEFAULT;
