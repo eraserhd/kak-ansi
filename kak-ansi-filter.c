@@ -2,10 +2,11 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <wchar.h>
 #include <wctype.h>
 
-#define DEFAULT 9
+#define DEFAULT -1
 
 typedef struct {
     int line;
@@ -114,7 +115,9 @@ char* format_attrs(char* s, int attrs)
 
 char* format_color(char* s, int color)
 {
-    if (IS_RGB(color))
+    if (color == DEFAULT)
+        strcpy(s, "default");
+    else if (IS_RGB(color))
         sprintf(s, "rgb:%06X", color & ~RGB_TAG);
     else
         strcpy(s, COLORS[color]);
