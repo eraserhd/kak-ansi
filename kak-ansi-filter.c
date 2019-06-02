@@ -180,7 +180,17 @@ int parse_extended_color(int* codes, int code_count, int *i)
             int p;
             if (*i+1 > code_count) break;
             p = codes[(*i)++];
-            return p;
+            if (p >= 0 && p <= 15)
+                return p;
+            else if (p >= 16 && p <= 231)
+            {
+                static const int LEVELS[] = { 0, 95, 135, 175, 215, 255 };
+                int r, g, b;
+                r = LEVELS[(p-16)/36%6];
+                g = LEVELS[(p-16)/6%6];
+                b = LEVELS[(p-16)%6];
+                return RGB(r,g,b);
+            }
         }
     }
     return DEFAULT;
