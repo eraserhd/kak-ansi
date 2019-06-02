@@ -318,6 +318,29 @@ int main(int argc, char* argv[])
 
     setlocale(LC_ALL, "en_US.utf8");
 
+    for (int i = 1; i < argc; i++)
+    {
+        if (!strcmp(argv[i], "-start"))
+        {
+            ++i;
+            if (i >= argc)
+            {
+                fwprintf(stderr, L"fail \"kak-ansi-filter: -start needs an argument\"\n");
+                exit(1);
+            }
+            if (sscanf(argv[i], "%d.%d", &current_coord.line, &current_coord.column) != 2)
+            {
+                fwprintf(stderr, L"fail \"kak-ansi-filter: invalid value for -start\"\n");
+                exit(1);
+            }
+        }
+        else
+        {
+            fwprintf(stderr, L"fail \"kak-ansi-filter: invalid argument '%s'\"\n", argv[i]);
+            exit(1);
+        }
+    }
+
     fwprintf(stderr, L"set-option -add buffer ansi_color_ranges");
     while ((ch = fgetwc(stdin)) != WEOF)
     {

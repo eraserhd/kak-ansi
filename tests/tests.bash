@@ -18,8 +18,7 @@ t 'new face for bg change' -in '\e[45mxxx\e[41myyy' -range '1.1,1.3|*' -range '1
 t 'no new face if no change' -in '\e[31mxxx\e[31myyy' -range '1.1,1.6|*' -no-range '1.4,1.6|*'
 t 'handles change at 2.1' -in 'xy\n\e[31mxxx' -range '2.1,2.3|*'
 t 'handles change at EOL' -in 'xy\e[31m\nxxx' -range '1.3,2.3|*'
-#t 'can specify start column'
-#t 'can specify start line'
+t 'can specify start coord' -flags '-start 8.3' -in '\e[32mxxx' -range '8.3,8.5|*'
 
 h2 "Foreground Color"
 t 'adds ranges for fg colors' -in ' \e[32m 1.' -range '1.2,1.4|green'

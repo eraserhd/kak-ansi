@@ -43,11 +43,24 @@ fail() {
 
 t() {
     local description="$1"
-    local in="$3"
-    shift 3
+    shift
+    local in='' flags=''
+    while [[ -z "$in" ]]; do
+        case "$1" in
+            -in)
+                in="$2"
+                shift 2
+                ;;
+            -flags)
+                flags="$2"
+                shift 2
+                ;;
+        esac
+    done
+
     printf '     %s ... ' "$description"
     local commands_file=$(mktemp)
-    TEST_OUT=$(printf "$in" | ./kak-ansi-filter 2>"$commands_file")
+    TEST_OUT=$(printf "$in" | ./kak-ansi-filter $flags 2>"$commands_file")
     read -ra TEST_COMMANDS <"$commands_file"
     rm -f "$commands_file"
 
