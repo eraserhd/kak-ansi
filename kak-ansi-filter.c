@@ -18,6 +18,7 @@ typedef enum {
     ITALIC    = 1<<3,
     UNDERLINE = 1<<4,
     BLINK     = 1<<5,
+    REVERSE   = 1<<7,
 } Attributes;
 
 typedef struct {
@@ -90,6 +91,7 @@ char* format_attrs(char* s, int attrs)
     {
         *p++ = '+';
         if (attrs & UNDERLINE) *p++ = 'u';
+        if (attrs & REVERSE)   *p++ = 'r';
         if (attrs & BOLD)      *p++ = 'b';
         if (attrs & BLINK)     *p++ = 'B';
         if (attrs & DIM)       *p++ = 'd';
@@ -147,12 +149,14 @@ void process_ansi_escape(wchar_t* seq)
         case 3:
         case 4:
         case 5:
+        case 7:
             current_face.attributes |= (1<<code);
             break;
         case 21:
         case 23:
         case 24:
         case 25:
+        case 27:
             current_face.attributes &= ~(1<<(code%10));
             break;
         case 22:

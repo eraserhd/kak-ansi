@@ -67,9 +67,11 @@ t '\e[5m sets blink' -in '\e[5mxxx' -range '1.1,1.3|default+B'
 t '\e[0m resets blink' -in '\e[5mx\e[0mx' -range '1.1,1.1|default+B'
 t '\e[25m resets blink' -in '\e[5mx\e[25mx' -range '1.1,1.1|default+B'
 
-#t '\e[7m sets reverse'
+h3 "Reverse"
+t '\e[7m sets reverse' -in '\e[7mxxx' -range '1.1,1.3|default+r'
+t '\e[0m resets all attributes' -in '\e[7mx\e[0mx' -range '1.1,1.1|default+r'
+t '\e[27m resets inverse' -in '\e[7mx\e[27mx' -range '1.1,1.1|default+r'
+
 #t '\e[22m sets normal intensity'
-#t '\e[27m resets inverse'
-#t '\e[0m resets all attributes'
 
 summarize
