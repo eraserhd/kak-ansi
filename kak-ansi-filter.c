@@ -161,6 +161,9 @@ void process_ansi_escape(wchar_t* seq)
         case 23:
             current_face.attributes &= ~ITALIC;
             break;
+        case 24:
+            current_face.attributes &= ~UNDERLINE;
+            break;
         case 30:
         case 31:
         case 32:
