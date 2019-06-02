@@ -217,32 +217,16 @@ void process_ansi_escape(wchar_t* seq)
         case 0:
             reset();
             break;
-        case 1:
-        case 2:
-        case 3:
-        case 4:
-        case 5:
-        case 7:
+        case 1: case 2: case 3: case 4: case 5: case 7:
             current_face.attributes |= (1<<code);
             break;
-        case 21:
-        case 23:
-        case 24:
-        case 25:
-        case 27:
+        case 21: case 23: case 24: case 25: case 27:
             current_face.attributes &= ~(1<<(code%10));
             break;
         case 22:
             current_face.attributes &= ~(BOLD | DIM);
             break;
-        case 30:
-        case 31:
-        case 32:
-        case 33:
-        case 34:
-        case 35:
-        case 36:
-        case 37:
+        case 30: case 31: case 32: case 33: case 34: case 35: case 36: case 37:
             current_face.foreground = code % 10;
             break;
         case 38:
@@ -251,14 +235,7 @@ void process_ansi_escape(wchar_t* seq)
         case 39:
             current_face.foreground = DEFAULT;
             break;
-        case 40:
-        case 41:
-        case 42:
-        case 43:
-        case 44:
-        case 45:
-        case 46:
-        case 47:
+        case 40: case 41: case 42: case 43: case 44: case 45: case 46: case 47:
             current_face.background = code % 10;
             break;
         case 48:
