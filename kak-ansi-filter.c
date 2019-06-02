@@ -123,12 +123,12 @@ char* format_color(char* s, int color)
 
 void format_face(char* s, size_t size, const Face* face)
 {
-    char attrs[64], fg[64];
+    char attrs[64], fg[64], bg[64];
     format_attrs(attrs, face->attributes);
     if (face->background == DEFAULT)
         snprintf(s, size, "%s%s", format_color(fg, face->foreground), attrs);
     else
-        snprintf(s, size, "%s,%s%s", format_color(fg, face->foreground), COLORS[face->background], attrs);
+        snprintf(s, size, "%s,%s%s", format_color(fg, face->foreground), format_color(bg, face->background), attrs);
 }
 
 void emit_face(Face* face)
@@ -215,6 +215,24 @@ void process_ansi_escape(wchar_t* seq)
         case 46:
         case 47:
             current_face.background = code % 10;
+            break;
+        case 48:
+            {
+                if (i >= code_count) break;
+                switch (codes[i++])
+                {
+                case 2:
+                    {
+                        int r, g, b;
+                        if (i+3 > code_count) break;
+                        r = codes[i++];
+                        g = codes[i++];
+                        b = codes[i++];
+                        current_face.background = RGB(r,g,b);
+                    }
+                    break;
+                }
+            }
             break;
         case 49:
             current_face.background = DEFAULT;

@@ -31,9 +31,9 @@ t '\e[38;2;r;g;bm sets true fg' -in '\e[38;2;253;17;129mxxx' -range '1.1,1.3|rgb
 h2 "Background Color"
 t 'adds ranges for bg colors' -in ' \e[41m 1.' -range '1.2,1.4|default,red'
 t '\e[49m resets bg' -in ' \e[41m 1.\e[49mx' -range '1.2,1.4|default,red'
-t '\e[0m resets bg' -in ' \e[42m 1.\e[0m hello'  -range '1.2,1.4|default,green'
-t '\e[m resets bg' -in ' \e[42m 1.\e[m hello'   -range '1.2,1.4|default,green'
-#t '\e[48;2;r;g;bm sets true bg'
+t '\e[0m resets bg' -in ' \e[42m 1.\e[0m hello' -range '1.2,1.4|default,green'
+t '\e[m resets bg' -in ' \e[42m 1.\e[m hello' -range '1.2,1.4|default,green'
+t '\e[48;2;r;g;bm sets true bg' -in '\e[48;2;17;129;253mxxx' -range '1.1,1.3|default,rgb:1181FD'
 #t '\e[48;5;0-7m sets bg palette'
 #t '\e[48;5;8-15m sets bg palette'
 #t '\e[48;5;Nm sets bg color'
