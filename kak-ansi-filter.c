@@ -123,12 +123,20 @@ char* format_color(char* s, int color)
 
 void format_face(char* s, size_t size, const Face* face)
 {
-    char attrs[64], fg[64], bg[64];
-    format_attrs(attrs, face->attributes);
+    char fg[64], bg[64], attrs[64];
     if (face->background == DEFAULT)
-        snprintf(s, size, "%s%s", format_color(fg, face->foreground), attrs);
+    {
+        snprintf(s, size, "%s%s", 
+                 format_color(fg, face->foreground),
+                 format_attrs(attrs, face->attributes));
+    }
     else
-        snprintf(s, size, "%s,%s%s", format_color(fg, face->foreground), format_color(bg, face->background), attrs);
+    {
+        snprintf(s, size, "%s,%s%s",
+                 format_color(fg, face->foreground),
+                 format_color(bg, face->background),
+                 format_attrs(attrs, face->attributes));
+    }
 }
 
 void emit_face(Face* face)
