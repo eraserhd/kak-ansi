@@ -62,11 +62,13 @@ t '\e[4m sets underline' -in '\e[4mxxx' -range '1.1,1.3|default+u'
 t '\e[0m resets underline' -in '\e[4mx\e[0mx' -range '1.1,1.1|default+u'
 t '\e[24m resets underline' -in '\e[4mx\e[24mx' -range '1.1,1.1|default+u'
 
-#t '\e[4m sets underline'
-#t '\e[5m sets blink'
+h3 "Blink"
+t '\e[5m sets blink' -in '\e[5mxxx' -range '1.1,1.3|default+B'
+#t '\e[0m resets blink'
+#t '\e[25m resets blink'
+
 #t '\e[7m sets reverse'
 #t '\e[22m sets normal intensity'
-#t '\e[25m resets blink'
 #t '\e[27m resets inverse'
 #t '\e[0m resets all attributes'
 
