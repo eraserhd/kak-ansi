@@ -166,7 +166,7 @@ int parse_extended_color(int* codes, int code_count, int *i)
         return DEFAULT;
     switch (codes[(*i)++])
     {
-    case 2:
+    case 2: /* True color */
         {
             int r, g, b;
             if (*i+3 > code_count) break;
@@ -175,14 +175,16 @@ int parse_extended_color(int* codes, int code_count, int *i)
             b = codes[(*i)++];
             return RGB(r,g,b);
         }
-    case 5:
+    case 5: /* 256 color */
         {
             int p;
             if (*i+1 > code_count) break;
             p = codes[(*i)++];
-            if (p >= 0 && p <= 15)
+            if (p >= 0 && p <= 15)         /* ANSI colors */
+            {
                 return p;
-            else if (p >= 16 && p <= 231)
+            }
+            else if (p >= 16 && p <= 231)  /* 6x6x6 color cube */
             {
                 static const int LEVELS[] = { 0, 95, 135, 175, 215, 255 };
                 int r, g, b;
@@ -190,6 +192,11 @@ int parse_extended_color(int* codes, int code_count, int *i)
                 g = LEVELS[(p-16)/6%6];
                 b = LEVELS[(p-16)%6];
                 return RGB(r,g,b);
+            }
+            else if (p >= 232 && p <= 255) /* greyscale */
+            {
+                int l = 8 + (p - 232)*10;
+                return RGB(l,l,l);
             }
         }
     }

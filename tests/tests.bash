@@ -28,7 +28,7 @@ t '\e[38;2;r;g;bm sets true fg' -in '\e[38;2;253;17;129mxxx' -range '1.1,1.3|rgb
 t '\e[38;5;0-7m sets ANSI color' -in '\e[38;5;2mxxx' -range '1.1,1.3|green'
 t '\e[38;5;8-15m sets bright ANSI color' -in '\e[38;5;10mxxx' -range '1.1,1.3|bright-green'
 t '\e[38;5;16-231m sets from 666 cube' -in '\e[38;5;121mxxx' -range '1.1,1.3|rgb:87FFAF'
-#t '\e[38;5;nm sets fg palette'
+t '\e[38;5;232-255m sets greyscale' -in '\e[38;5;239mxxx' -range '1.1,1.3|rgb:4E4E4E'
 #t 'can set palette colors'
 
 h2 "Background Color"
