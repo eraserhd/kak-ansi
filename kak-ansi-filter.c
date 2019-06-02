@@ -42,8 +42,14 @@ static const char* COLORS[] =
     "magenta",
     "cyan",
     "white",
-    NULL,
-    "default",
+    "bright-black",
+    "bright-red",
+    "bright-green",
+    "bright-yellow",
+    "bright-blue",
+    "bright-magenta",
+    "bright-cyan",
+    "bright-white",
 };
 
 static const Face DEFAULT_FACE =
