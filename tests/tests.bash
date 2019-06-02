@@ -41,13 +41,15 @@ t '\e[m resets bg' -in ' \e[42m 1.\e[m hello'   -range '1.2,1.4|default,green'
 #t 'can set palette colors'
 
 h2 "Attributes"
+h3 "Bold"
 t '\e[1m sets bold' -in 'x\e[1mxx' -range '1.2,1.3|default+b'
+t '\e[21m resets bold' -in 'x\e[1mx\e[21mx' -range '1.2,1.2|*'
+t '\e[0m resets bold' -in 'x\e[1mx\e[0mx' -range '1.2,1.2|*'
 #t '\e[2m sets dim'
 #t '\e[3m sets italic'
 #t '\e[4m sets underline'
 #t '\e[5m sets blink'
 #t '\e[7m sets reverse'
-t '\e[21m resets bold' -in 'x\e[1mx\e[21mx' -range '1.2,1.2|*'
 #t '\e[22m sets normal intensity'
 #t '\e[23m resets italic'
 #t '\e[24m resets underline'

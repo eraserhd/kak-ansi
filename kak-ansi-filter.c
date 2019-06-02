@@ -96,6 +96,7 @@ void reset(void)
 {
     current_face.foreground = DEFAULT;
     current_face.background = DEFAULT;
+    current_face.attributes = 0;
 }
 
 void emit_face(Face* face)
@@ -121,14 +122,40 @@ void process_ansi_escape(wchar_t* seq)
         int code = codes[i];
         switch (code)
         {
-        case 0:  reset();                          break;
-        case 1:  current_face.attributes |= BOLD;  break;
-        case 21: current_face.attributes &= ~BOLD; break;
-        default:
-            if (code >= 30 && code <= 39)
-                current_face.foreground = code % 10;
-            else if (code >= 40 && code <= 49)
-                current_face.background = code % 10;
+        case 0:
+            reset();
+            break;
+        case 1:
+            current_face.attributes |= BOLD;
+            break;
+        case 21:
+            current_face.attributes &= ~BOLD;
+            break;
+        case 30:
+        case 31:
+        case 32:
+        case 33:
+        case 34:
+        case 35:
+        case 36:
+        case 37:
+            current_face.foreground = code % 10;
+            break;
+        case 39:
+            current_face.foreground = DEFAULT;
+            break;
+        case 40:
+        case 41:
+        case 42:
+        case 43:
+        case 44:
+        case 45:
+        case 46:
+        case 47:
+            current_face.background = code % 10;
+            break;
+        case 49:
+            current_face.background = DEFAULT;
             break;
         }
     }

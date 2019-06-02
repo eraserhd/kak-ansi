@@ -8,6 +8,10 @@ h2() {
     printf '\n \e[33;1m%s\e[0m\n' "$1"
 }
 
+h3() {
+    :
+}
+
 hasGlob() {
     local pattern="$1"
     shift
