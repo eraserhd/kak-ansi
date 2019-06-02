@@ -52,7 +52,9 @@ t '\e[2m sets dim' -in '\e[2mxxx' -range '1.1,1.3|default+d'
 t '\e[0m resets dim' -in '\e[2mx\e[0mx' -range '1.1,1.1|default+d'
 t '\e[22m resets dim' -in '\e[2mxx\e[22mx' -range '1.1,1.2|default+d'
 
-#t '\e[3m sets italic'
+h3 "Italic"
+t '\e[3m sets italic' -in '\e[3mxxx' -range '1.1,1.3|default+i'
+
 #t '\e[4m sets underline'
 #t '\e[5m sets blink'
 #t '\e[7m sets reverse'

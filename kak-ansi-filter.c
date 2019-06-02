@@ -13,8 +13,9 @@ typedef struct {
 } Coord;
 
 typedef enum {
-    BOLD = 0x01,
-    DIM  = 0x02,
+    BOLD   = 0x01,
+    DIM    = 0x02,
+    ITALIC = 0x04,
 } Attributes;
 
 typedef struct {
@@ -86,8 +87,9 @@ char* format_attrs(char* s, int attrs)
     if (attrs != 0)
     {
         *p++ = '+';
-        if (attrs & BOLD) *p++ = 'b';
-        if (attrs & DIM)  *p++ = 'd';
+        if (attrs & BOLD)   *p++ = 'b';
+        if (attrs & DIM)    *p++ = 'd';
+        if (attrs & ITALIC) *p++ = 'i';
     }
     *p++ = '\0';
     return s;
@@ -141,6 +143,9 @@ void process_ansi_escape(wchar_t* seq)
             break;
         case 2:
             current_face.attributes |= DIM;
+            break;
+        case 3:
+            current_face.attributes |= ITALIC;
             break;
         case 21:
             current_face.attributes &= ~BOLD;

@@ -9,7 +9,7 @@ h2() {
 }
 
 h3() {
-    :
+    printf '   \e[33m%s\e[0m\n' "$1"
 }
 
 hasGlob() {
@@ -45,7 +45,7 @@ t() {
     local description="$1"
     local in="$3"
     shift 3
-    printf '   %s ... ' "$description"
+    printf '     %s ... ' "$description"
     local commands_file=$(mktemp)
     TEST_OUT=$(printf "$in" | ./kak-ansi-filter 2>"$commands_file")
     read -ra TEST_COMMANDS <"$commands_file"
