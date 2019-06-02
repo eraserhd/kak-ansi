@@ -146,7 +146,7 @@ void process_ansi_escape(wchar_t* seq)
             current_face.attributes &= ~BOLD;
             break;
         case 22:
-            current_face.attributes &= ~BOLD;
+            current_face.attributes &= ~(BOLD | DIM);
             break;
         case 30:
         case 31:

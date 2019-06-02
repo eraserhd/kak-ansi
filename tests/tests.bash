@@ -49,6 +49,7 @@ t '\e[22m resets bold' -in 'x\e[1mx\e[22mx' -range '1.2,1.2|*'
 
 h3 "Dim"
 t '\e[2m sets dim' -in '\e[2mxxx' -range '1.1,1.3|default+d'
+t '\e[22m resets dim' -in '\e[2mxx\e[22mx' -range '1.1,1.2|default+d'
 
 #t '\e[3m sets italic'
 #t '\e[4m sets underline'
