@@ -65,7 +65,7 @@ t '\e[24m resets underline' -in '\e[4mx\e[24mx' -range '1.1,1.1|default+u'
 h3 "Blink"
 t '\e[5m sets blink' -in '\e[5mxxx' -range '1.1,1.3|default+B'
 t '\e[0m resets blink' -in '\e[5mx\e[0mx' -range '1.1,1.1|default+B'
-#t '\e[25m resets blink'
+t '\e[25m resets blink' -in '\e[5mx\e[25mx' -range '1.1,1.1|default+B'
 
 #t '\e[7m sets reverse'
 #t '\e[22m sets normal intensity'

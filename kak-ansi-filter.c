@@ -152,6 +152,7 @@ void process_ansi_escape(wchar_t* seq)
         case 21:
         case 23:
         case 24:
+        case 25:
             current_face.attributes &= ~(1<<(code%10));
             break;
         case 22:
