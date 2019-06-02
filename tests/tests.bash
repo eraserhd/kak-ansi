@@ -24,8 +24,8 @@ t 'adds ranges for fg colors' -in ' \e[32m 1.' -range '1.2,1.4|green'
 t '\e[39m resets fg' -in ' \e[32m 1.\e[39mxx' -range '1.2,1.4|green'
 t '\e[0m resets fg' -in ' \e[32m 1.\e[0m hello' -range '1.2,1.4|green'
 t '\e[m resets fg' -in ' \e[32m 1.\e[m hello' -range '1.2,1.4|green'
+t '\e[38;2;r;g;bm sets true fg' -in '\e[38;2;253;17;129mxxx' -range '1.1,1.3|rgb:FD1181'
 #t '\e[38;5;nm sets fg palette'
-#t '\e[38;2;r;g;bm sets true fg'
 #t 'can set palette colors'
 
 h2 "Background Color"
@@ -33,11 +33,11 @@ t 'adds ranges for bg colors' -in ' \e[41m 1.' -range '1.2,1.4|default,red'
 t '\e[49m resets bg' -in ' \e[41m 1.\e[49mx' -range '1.2,1.4|default,red'
 t '\e[0m resets bg' -in ' \e[42m 1.\e[0m hello'  -range '1.2,1.4|default,green'
 t '\e[m resets bg' -in ' \e[42m 1.\e[m hello'   -range '1.2,1.4|default,green'
+#t '\e[48;2;r;g;bm sets true bg'
 #t '\e[48;5;0-7m sets bg palette'
 #t '\e[48;5;8-15m sets bg palette'
 #t '\e[48;5;Nm sets bg color'
 #t '\e[48;5;Nm sets bg grey'
-#t '\e[48;2;r;g;bm sets true bg'
 #t 'can set palette colors'
 
 h2 "Attributes"
@@ -71,7 +71,5 @@ h3 "Reverse"
 t '\e[7m sets reverse' -in '\e[7mxxx' -range '1.1,1.3|default+r'
 t '\e[0m resets all attributes' -in '\e[7mx\e[0mx' -range '1.1,1.1|default+r'
 t '\e[27m resets inverse' -in '\e[7mx\e[27mx' -range '1.1,1.1|default+r'
-
-#t '\e[22m sets normal intensity'
 
 summarize

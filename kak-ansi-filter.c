@@ -27,18 +27,22 @@ typedef struct {
     Attributes attributes;
 } Face;
 
-static const wchar_t* COLORS[] =
+#define RGB_TAG       (1<<25)
+#define RGB(r,g,b)    (RGB_TAG|((r)<<16)|((g)<<8)|(b))
+#define IS_RGB(color) ((color)&RGB_TAG)
+
+static const char* COLORS[] =
 {
-    L"black",
-    L"red",
-    L"green",
-    L"yellow",
-    L"blue",
-    L"magenta",
-    L"cyan",
-    L"white",
-    L"-",
-    L"default",
+    "black",
+    "red",
+    "green",
+    "yellow",
+    "blue",
+    "magenta",
+    "cyan",
+    "white",
+    NULL,
+    "default",
 };
 
 static const Face DEFAULT_FACE =
@@ -61,6 +65,13 @@ Coord      face_start_coord    = { .line = 1, .column = 1 };
 wchar_t    escape_sequence[1024];
 int        escape_sequence_length = 0;
 
+void reset(void)
+{
+    current_face.foreground = DEFAULT;
+    current_face.background = DEFAULT;
+    current_face.attributes = 0;
+}
+
 bool faces_equal(const Face* a, const Face* b)
 {
     return a->foreground == b->foreground && a->background == b->background &&
@@ -77,7 +88,7 @@ int parse_codes(const wchar_t* p, int* codes, int max_codes)
             codes[count] = -1;
             swscanf(p + 1, L"%d", &codes[count]);
             if (codes[count] == -1)
-                continue;
+                return 0;
             ++count;
         }
     }
@@ -101,30 +112,32 @@ char* format_attrs(char* s, int attrs)
     return s;
 }
 
-void format_face(wchar_t* s, size_t size, const Face* face)
+char* format_color(char* s, int color)
 {
-    char attrs[64] = "";
-    format_attrs(attrs, face->attributes);
-    if (face->background == DEFAULT)
-        swprintf(s, size, L"%ls%s", COLORS[face->foreground], attrs);
+    if (color & RGB_TAG)
+        sprintf(s, "rgb:%06X", color & ~RGB_TAG);
     else
-        swprintf(s, size, L"%ls,%ls%s", COLORS[face->foreground], COLORS[face->background], attrs);
+        strcpy(s, COLORS[color]);
+    return s;
 }
 
-void reset(void)
+void format_face(char* s, size_t size, const Face* face)
 {
-    current_face.foreground = DEFAULT;
-    current_face.background = DEFAULT;
-    current_face.attributes = 0;
+    char attrs[64], fg[64];
+    format_attrs(attrs, face->attributes);
+    if (face->background == DEFAULT)
+        snprintf(s, size, "%s%s", format_color(fg, face->foreground), attrs);
+    else
+        snprintf(s, size, "%s,%s%s", format_color(fg, face->foreground), COLORS[face->background], attrs);
 }
 
 void emit_face(Face* face)
 {
-    wchar_t facename[128];
+    char facename[128];
     if (faces_equal(face, &DEFAULT_FACE))
         return;
     format_face(facename, 127, face);
-    fwprintf(stderr, L" %d.%d,%d.%d|%ls",
+    fwprintf(stderr, L" %d.%d,%d.%d|%s",
              face_start_coord.line, face_start_coord.column,
              previous_char_coord.line, previous_char_coord.column,
              facename);
@@ -136,9 +149,9 @@ void process_ansi_escape(wchar_t* seq)
     int code_count = parse_codes(seq, codes, sizeof(codes)/sizeof(codes[0]));
     Face previous_face = current_face;
 
-    for (int i = 0; i < code_count; i++)
+    for (int i = 0; i < code_count;)
     {
-        int code = codes[i];
+        int code = codes[i++];
         switch (code)
         {
         case 0:
@@ -171,6 +184,24 @@ void process_ansi_escape(wchar_t* seq)
         case 36:
         case 37:
             current_face.foreground = code % 10;
+            break;
+        case 38:
+            {
+                if (i >= code_count) break;
+                switch (codes[i++])
+                {
+                case 2:
+                    {
+                        int r, g, b;
+                        if (i+3 > code_count) break;
+                        r = codes[i++];
+                        g = codes[i++];
+                        b = codes[i++];
+                        current_face.foreground = RGB(r,g,b);
+                    }
+                    break;
+                }
+            }
             break;
         case 39:
             current_face.foreground = DEFAULT;
