@@ -80,19 +80,27 @@ int parse_codes(const wchar_t* p, int* codes, int max_codes)
     return count;
 }
 
+char* format_attrs(char* s, int attrs)
+{
+    char *p = s;
+    if (attrs != 0)
+    {
+        *p++ = '+';
+        if (attrs & BOLD) *p++ = 'b';
+        if (attrs & DIM)  *p++ = 'd';
+    }
+    *p++ = '\0';
+    return s;
+}
+
 void format_face(wchar_t* s, size_t size, const Face* face)
 {
-    wchar_t attrs[64] = L"";
-    if (face->attributes != 0)
-        wcscpy(attrs, L"+");
-    if (face->attributes & BOLD)
-        wcscat(attrs, L"b");
-    if (face->attributes & DIM)
-        wcscat(attrs, L"d");
+    char attrs[64] = "";
+    format_attrs(attrs, face->attributes);
     if (face->background == DEFAULT)
-        swprintf(s, size, L"%ls%ls", COLORS[face->foreground], attrs);
+        swprintf(s, size, L"%ls%s", COLORS[face->foreground], attrs);
     else
-        swprintf(s, size, L"%ls,%ls%ls", COLORS[face->foreground], COLORS[face->background], attrs);
+        swprintf(s, size, L"%ls,%ls%s", COLORS[face->foreground], COLORS[face->background], attrs);
 }
 
 void reset(void)
@@ -171,8 +179,8 @@ void process_ansi_escape(wchar_t* seq)
     if (code_count == 0)
         reset();
 
-   if (!faces_equal(&previous_face, &current_face))
-   {
+    if (!faces_equal(&previous_face, &current_face))
+    {
         emit_face(&previous_face);
         face_start_coord = current_coord;
     }
