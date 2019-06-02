@@ -45,6 +45,7 @@ h3 "Bold"
 t '\e[1m sets bold' -in 'x\e[1mxx' -range '1.2,1.3|default+b'
 t '\e[21m resets bold' -in 'x\e[1mx\e[21mx' -range '1.2,1.2|*'
 t '\e[0m resets bold' -in 'x\e[1mx\e[0mx' -range '1.2,1.2|*'
+t '\e[22m resets bold' -in 'x\e[1mx\e[22mx' -range '1.2,1.2|*'
 #t '\e[2m sets dim'
 #t '\e[3m sets italic'
 #t '\e[4m sets underline'
