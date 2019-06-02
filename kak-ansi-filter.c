@@ -13,10 +13,10 @@ typedef struct {
 } Coord;
 
 typedef enum {
-    BOLD      = 0x01,
-    DIM       = 0x02,
-    ITALIC    = 0x04,
-    UNDERLINE = 0x10,
+    BOLD      = 1<<1,
+    DIM       = 1<<2,
+    ITALIC    = 1<<3,
+    UNDERLINE = 1<<4,
 } Attributes;
 
 typedef struct {
@@ -141,28 +141,18 @@ void process_ansi_escape(wchar_t* seq)
             reset();
             break;
         case 1:
-            current_face.attributes |= BOLD;
-            break;
         case 2:
-            current_face.attributes |= DIM;
-            break;
         case 3:
-            current_face.attributes |= ITALIC;
-            break;
         case 4:
-            current_face.attributes |= UNDERLINE;
+            current_face.attributes |= (1<<code);
             break;
         case 21:
-            current_face.attributes &= ~BOLD;
+        case 23:
+        case 24:
+            current_face.attributes &= ~(1<<(code%10));
             break;
         case 22:
             current_face.attributes &= ~(BOLD | DIM);
-            break;
-        case 23:
-            current_face.attributes &= ~ITALIC;
-            break;
-        case 24:
-            current_face.attributes &= ~UNDERLINE;
             break;
         case 30:
         case 31:
