@@ -18,6 +18,8 @@ t 'new face for bg change' -in '\e[45mxxx\e[41myyy' -range '1.1,1.3|*' -range '1
 t 'no new face if no change' -in '\e[31mxxx\e[31myyy' -range '1.1,1.6|*' -no-range '1.4,1.6|*'
 t 'handles change at 2.1' -in 'xy\n\e[31mxxx' -range '2.1,2.3|*'
 t 'handles change at EOL' -in 'xy\e[31m\nxxx' -range '1.3,2.3|*'
+#t 'can specify start column'
+#t 'can specify start line'
 
 h2 "Foreground Color"
 t 'adds ranges for fg colors' -in ' \e[32m 1.' -range '1.2,1.4|green'
@@ -37,11 +39,6 @@ t '\e[49m resets bg' -in ' \e[41m 1.\e[49mx' -range '1.2,1.4|default,red'
 t '\e[0m resets bg' -in ' \e[42m 1.\e[0m hello' -range '1.2,1.4|default,green'
 t '\e[m resets bg' -in ' \e[42m 1.\e[m hello' -range '1.2,1.4|default,green'
 t '\e[48;2;r;g;bm sets true bg' -in '\e[48;2;17;129;253mxxx' -range '1.1,1.3|default,rgb:1181FD'
-#t '\e[48;5;0-7m sets bg palette'
-#t '\e[48;5;8-15m sets bg palette'
-#t '\e[48;5;Nm sets bg color'
-#t '\e[48;5;Nm sets bg grey'
-#t 'can set palette colors'
 
 h2 "Attributes"
 h3 "Bold"
