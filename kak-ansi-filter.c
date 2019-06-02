@@ -153,6 +153,9 @@ void process_ansi_escape(wchar_t* seq)
         case 22:
             current_face.attributes &= ~(BOLD | DIM);
             break;
+        case 23:
+            current_face.attributes &= ~ITALIC;
+            break;
         case 30:
         case 31:
         case 32:
