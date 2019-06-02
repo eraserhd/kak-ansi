@@ -25,6 +25,7 @@ t '\e[39m resets fg' -in ' \e[32m 1.\e[39mxx' -range '1.2,1.4|green'
 t '\e[0m resets fg' -in ' \e[32m 1.\e[0m hello' -range '1.2,1.4|green'
 t '\e[m resets fg' -in ' \e[32m 1.\e[m hello' -range '1.2,1.4|green'
 t '\e[38;2;r;g;bm sets true fg' -in '\e[38;2;253;17;129mxxx' -range '1.1,1.3|rgb:FD1181'
+t '\e[38;5;0-7m sets ANSI color' -in '\e[38;5;2mxxx' -range '1.1,1.3|green'
 #t '\e[38;5;nm sets fg palette'
 #t 'can set palette colors'
 

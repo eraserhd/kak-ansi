@@ -114,7 +114,7 @@ char* format_attrs(char* s, int attrs)
 
 char* format_color(char* s, int color)
 {
-    if (color & RGB_TAG)
+    if (IS_RGB(color))
         sprintf(s, "rgb:%06X", color & ~RGB_TAG);
     else
         strcpy(s, COLORS[color]);
@@ -165,6 +165,13 @@ int parse_extended_color(int* codes, int code_count, int *i)
             g = codes[(*i)++];
             b = codes[(*i)++];
             return RGB(r,g,b);
+        }
+    case 5:
+        {
+            int p;
+            if (*i+1 > code_count) break;
+            p = codes[(*i)++];
+            return p;
         }
     }
     return DEFAULT;
