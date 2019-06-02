@@ -1,6 +1,16 @@
 declare-option -hidden range-specs ansi_color_ranges
 declare-option -hidden str ansi_command_file
-declare-option -hidden str ansi_filter /home/jfelice/src/kak-ansi/kak-ansi-filter
+declare-option -hidden str ansi_filter %sh{
+    filterdir="$(dirname $kak_source)/.."
+    filter="${filterdir}/kak-ansi-filter"
+    if ! [ -x "${filter}" ]; then
+        ( cd "$filterdir" && make )
+        if ! [ -x "${filter}" ]; then
+            filter=$(command -v cat)
+        fi
+    fi
+    printf '%s' "$filter"
+}
 
 define-command \
     -docstring %{ansi-render-selection: colorize ANSI codes contained inside selection
@@ -14,7 +24,6 @@ are removed.} \
             add-highlighter buffer/ansi ranges ansi_color_ranges
             set-option buffer ansi_color_ranges %val{timestamp}
         }
-        update-option buffer ansi_color_ranges
         set-option buffer ansi_command_file %sh{mktemp}
         execute-keys "|%opt{ansi_filter} 2>%opt{ansi_command_file}<ret>"
         update-option buffer ansi_color_ranges
