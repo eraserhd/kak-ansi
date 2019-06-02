@@ -59,6 +59,7 @@ t '\e[23m resets italic' -in '\e[3mx\e[23mxx' -range '1.1,1.1|default+i'
 
 h3 "Underline"
 t '\e[4m sets underline' -in '\e[4mxxx' -range '1.1,1.3|default+u'
+t '\e[0m resets underline' -in '\e[4mx\e[0mx' -range '1.1,1.1|default+u'
 t '\e[24m resets underline' -in '\e[4mx\e[24mx' -range '1.1,1.1|default+u'
 
 #t '\e[4m sets underline'
