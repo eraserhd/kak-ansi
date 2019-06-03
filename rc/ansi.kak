@@ -51,10 +51,7 @@ are removed.} \
 }
 
 define-command \
-    -docstring %{ansi-render: colorize buffer by using ANSI codes
-
-After highlighters are added to colorize the buffer, the ANSI codes
-are removed.} \
+    -docstring %{ansi-render: colorize buffer by using ANSI codes  After highlighters are added to colorize the buffer, the ANSI codes are removed.} \
     -params 0 \
     ansi-render %{
     evaluate-commands -draft %{

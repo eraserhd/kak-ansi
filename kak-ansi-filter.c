@@ -67,7 +67,7 @@ Face current_face =
 };
 
 Coord   current_coord       = { .line = 1, .column = 1 };
-Coord   previous_char_coord = { .line = 1, .column = 0 };
+Coord   previous_char_end   = { .line = 1, .column = 0 };
 Coord   face_start_coord    = { .line = 1, .column = 1 };
 bool    in_G1_character_set = false;
 wchar_t escape_sequence[1024];
@@ -160,7 +160,7 @@ void emit_face(Face* face)
     format_face(facename, 127, face);
     fwprintf(stderr, L" %d.%d,%d.%d|%s",
              face_start_coord.line, face_start_coord.column,
-             previous_char_coord.line, previous_char_coord.column,
+             previous_char_end.line, previous_char_end.column,
              facename);
 }
 
@@ -352,7 +352,7 @@ size_t byte_count(wchar_t ch)
     char buf[MB_CUR_MAX];
     mbstate_t mbs;
     size_t count;
-    mbsinit(&mbs);
+    memset(&mbs, 0, sizeof(mbs));
     count = wcrtomb(buf, ch, &mbs);
     if (count == (size_t)-1)
         return 1;
@@ -365,7 +365,8 @@ void display_char(wchar_t ch)
     ch = translate_char(ch);
     putwchar(ch);
 
-    previous_char_coord = current_coord;
+    previous_char_end = current_coord;
+    previous_char_end.column += byte_count(ch) - 1;
     if (ch == L'\n')
     {
         ++current_coord.line;
