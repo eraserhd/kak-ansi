@@ -64,7 +64,7 @@ t() {
     local command_words
     read -ra command_words <"$commands_file"
     TEST_RANGES=( "${command_words[@]:4}" )
-
+    local ranges_specified=false range_count=0
     TEST_OK=true
 
     while (( $# > 0 )); do
@@ -76,24 +76,15 @@ t() {
             shift 2
             ;;
         -range)
+            ranges_specified=true
+            range_count=$(( range_count + 1 ))
             if ! hasGlob "$2" "${TEST_RANGES[@]}"; then
-                fail "$1" "$2"
-            fi
-            shift 2
-            ;;
-        -only-range)
-            if ! hasGlob "$2" "${TEST_RANGES[@]}"; then
-                fail "$1" "$2"
-            fi
-            if (( ${#TEST_RANGES[@]} != 1 )); then
                 fail "$1" "$2"
             fi
             shift 2
             ;;
         -no-ranges)
-            if hasGlob "*|*" "${TEST_RANGES[@]}"; then
-                fail "$1"
-            fi
+            ranges_specified=true
             shift
             ;;
         *)
@@ -102,6 +93,12 @@ t() {
             ;;
         esac
     done
+    
+    if $ranges_specified; then
+        if (( ${#TEST_RANGES[@]} != range_count )); then
+            fail 'count of ranges'
+        fi
+    fi
 
     TEST_COUNT=$(( TEST_COUNT + 1 ))
     if $TEST_OK; then
