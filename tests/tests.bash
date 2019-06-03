@@ -14,6 +14,7 @@ t 'emits face at EOF' -in '\e[32mxxx' -range '1.1,1.3|*'
 t 'does not emit default face' -in '\e[39mxxx' -no-ranges
 t 'new face for fg change' -in '\e[32mxxx\e[31myyy' -range '1.1,1.3|*' -range '1.4,1.6|*'
 t 'new face for bg change' -in '\e[45mxxx\e[41myyy' -range '1.1,1.3|*' -range '1.4,1.6|*'
+t 'merges ranges' -in '\e[32m\e[1mxxx' -only-range '1.1,1.3|green+b'
 #t 'new face for attr change'
 t 'no new face if no change' -in '\e[31mxxx\e[31myyy' -range '1.1,1.6|*' -no-range '1.4,1.6|*'
 t 'handles change at 2.1' -in 'xy\n\e[31mxxx' -range '2.1,2.3|*'

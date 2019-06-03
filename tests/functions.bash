@@ -2,7 +2,7 @@ TEST_COUNT=0
 TESTS_FAILED=0
 TEST_OK=true
 TEST_OUTPUT=''
-TEST_COMMANDS=()
+TEST_RANGES=()
 
 h2() {
     printf '\n \e[33;1m%s\e[0m\n' "$1"
@@ -37,7 +37,7 @@ fail() {
     TEST_OK=false
     printf '      Assertion: \e[31m%s\e[0m\n' "$*"
     printf "         Output: '%s'\n" "$TEST_OUT"
-    printf "       Commands: '%s'\n" "${TEST_COMMANDS[*]}"
+    printf "         Ranges: %s\n" "${TEST_RANGES[*]}"
     printf '\n'
 }
 
@@ -61,8 +61,9 @@ t() {
     printf '     %s ... ' "$description"
     local commands_file=$(mktemp)
     TEST_OUT=$(printf "$in" | ./kak-ansi-filter $flags 2>"$commands_file")
-    read -ra TEST_COMMANDS <"$commands_file"
-    rm -f "$commands_file"
+    local command_words
+    read -ra command_words <"$commands_file"
+    TEST_RANGES=( "${command_words[@]:4}" )
 
     TEST_OK=true
 
@@ -75,19 +76,28 @@ t() {
             shift 2
             ;;
         -range)
-            if ! hasGlob "$2" "${TEST_COMMANDS[@]}"; then
+            if ! hasGlob "$2" "${TEST_RANGES[@]}"; then
+                fail "$1" "$2"
+            fi
+            shift 2
+            ;;
+        -only-range)
+            if ! hasGlob "$2" "${TEST_RANGES[@]}"; then
+                fail "$1" "$2"
+            fi
+            if (( ${#TEST_RANGES[@]} != 1 )); then
                 fail "$1" "$2"
             fi
             shift 2
             ;;
         -no-range)
-            if hasGlob "$2" "${TEST_COMMANDS[@]}"; then
+            if hasGlob "$2" "${TEST_RANGES[@]}"; then
                 fail "$1" "$2"
             fi
             shift 2
             ;;
         -no-ranges)
-            if hasGlob "*|*" "${TEST_COMMANDS[@]}"; then
+            if hasGlob "*|*" "${TEST_RANGES[@]}"; then
                 fail "$1"
             fi
             shift

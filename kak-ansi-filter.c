@@ -66,11 +66,11 @@ Face current_face =
     .attributes = 0
 };
 
-Coord      current_coord       = { .line = 1, .column = 1 };
-Coord      previous_char_coord = { .line = 1, .column = 0 };
-Coord      face_start_coord    = { .line = 1, .column = 1 };
-wchar_t    escape_sequence[1024];
-int        escape_sequence_length = 0;
+Coord   current_coord       = { .line = 1, .column = 1 };
+Coord   previous_char_coord = { .line = 1, .column = 0 };
+Coord   face_start_coord    = { .line = 1, .column = 1 };
+wchar_t escape_sequence[1024];
+int     escape_sequence_length = 0;
 
 void reset(void)
 {
@@ -152,6 +152,9 @@ void emit_face(Face* face)
 {
     char facename[128];
     if (faces_equal(face, &DEFAULT_FACE))
+        return;
+    if (face_start_coord.line == current_coord.line &&
+        face_start_coord.column == current_coord.column)
         return;
     format_face(facename, 127, face);
     fwprintf(stderr, L" %d.%d,%d.%d|%s",
