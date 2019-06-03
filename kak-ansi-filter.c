@@ -266,6 +266,8 @@ void process_escape_sequence(wchar_t* seq)
         return;
     if (seq[1] == L'[' && seq[wcslen(seq)-1] == 'm')
         process_ansi_escape(seq);
+    if (!wcscmp(seq, L"\x1B(0"))
+        in_G1_character_set = true;
 }
 
 void add_escape_char(wchar_t ch)
@@ -296,6 +298,18 @@ bool handle_escape_char(wchar_t ch)
     if (ch == L'[' && escape_sequence_length == 1)
     {
         add_escape_char(ch);
+        return true;
+    }
+    if (ch == L'(' && escape_sequence_length == 1)
+    {
+        add_escape_char(ch);
+        return true;
+    }
+    if (ch == L'0' && escape_sequence_length == 2 && escape_sequence[1] == L'(')
+    {
+        add_escape_char(ch);
+        process_escape_sequence(escape_sequence);
+        escape_sequence_length = 0;
         return true;
     }
     if ((ch == L';' || iswdigit(ch)) && escape_sequence_length > 1)

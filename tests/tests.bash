@@ -3,7 +3,7 @@ source tests/functions.bash
 
 h2 "Fixing Output"
 t 'removes ANSI escapes' -in ' \e[32m 1.\e[39m hello' -out '  1. hello'
-#t '\e(0 selects line-drawing' -in '\e(0jklmnqtuvwx' -out '┘┐┌└┼─├┤┴┬│'
+t '\e(0 selects line-drawing' -in '\e(0jklmnqtuvwx' -out '┘┐┌└┼─├┤┴┬│'
 #t '\e(B resets line-drawing'
 t 'ASCII SO selects line-drawing' -in '\x0Ejklmnqtuvwx' -out '┘┐┌└┼─├┤┴┬│'
 t 'ASCII SI resets line-drawing' -in '\x0E\x0Fjklmnqtuvwx' -out 'jklmnqtuvwx'
