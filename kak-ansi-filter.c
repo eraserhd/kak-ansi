@@ -69,6 +69,7 @@ Face current_face =
 Coord   current_coord       = { .line = 1, .column = 1 };
 Coord   previous_char_coord = { .line = 1, .column = 0 };
 Coord   face_start_coord    = { .line = 1, .column = 1 };
+bool    in_G1_character_set = false;
 wchar_t escape_sequence[1024];
 int     escape_sequence_length = 0;
 
@@ -277,6 +278,11 @@ void add_escape_char(wchar_t ch)
 
 bool handle_escape_char(wchar_t ch)
 {
+    if (ch == 0x0e && escape_sequence_length == 0)
+    {
+        in_G1_character_set = true;
+        return true;
+    }
     if (ch == 0x1b && escape_sequence_length == 0)
     {
         add_escape_char(ch);
@@ -302,9 +308,32 @@ bool handle_escape_char(wchar_t ch)
     return false;
 }
 
+wchar_t translate_char(wchar_t ch)
+{
+    if (in_G1_character_set)
+    {
+        switch (ch)
+        {
+        case L'j': return L'┘';
+        case L'k': return L'┐';
+        case L'l': return L'┌';
+        case L'm': return L'└';
+        case L'n': return L'┼';
+        case L'q': return L'─';
+        case L't': return L'├';
+        case L'u': return L'┤';
+        case L'v': return L'┴';
+        case L'w': return L'┬';
+        case L'x': return L'│';
+        }
+    }
+    return ch;
+}
+
 void display_char(wchar_t ch)
 {
-    putwchar(ch);
+    putwchar(translate_char(ch));
+
     previous_char_coord = current_coord;
     if (ch == L'\n')
     {

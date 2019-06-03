@@ -35,8 +35,11 @@ fail() {
         printf '\e[31;1mfailed\e[0m\n'
     fi
     TEST_OK=false
+    local escaped_out="$TEST_OUT"
+    escaped_out="${escaped_out///\\x0E}"
+    escaped_out="${escaped_out///\\x0F}"
     printf '      Assertion: \e[31m%s\e[0m\n' "$*"
-    printf "         Output: '%s'\n" "$TEST_OUT"
+    printf "         Output: '%s'\n" "$escaped_out"
     printf "         Ranges: %s\n" "${TEST_RANGES[*]}"
     printf '\n'
 }

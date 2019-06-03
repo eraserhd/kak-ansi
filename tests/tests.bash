@@ -3,11 +3,10 @@ source tests/functions.bash
 
 h2 "Fixing Output"
 t 'removes ANSI escapes' -in ' \e[32m 1.\e[39m hello' -out '  1. hello'
-#t '\e(0 selects line-drawing'
+#t '\e(0 selects line-drawing' -in '\e(0jklmnqtuvwx' -out '┘┐┌└┼─├┤┴┬│'
 #t '\e(B resets line-drawing'
-#t 'ASCII SO selects line-drawing'
+t 'ASCII SO selects line-drawing' -in '\x0Ejklmnqtuvwx' -out '┘┐┌└┼─├┤┴┬│'
 #t 'ASCII SI resets line-drawing'
-#t 'removes trailing spaces'
 
 h2 "Computing Ranges"
 t 'emits face at EOF' -in '\e[32mxxx' -range '1.1,1.3|*'
@@ -16,7 +15,6 @@ t 'new face for fg change' -in '\e[32mxxx\e[31myyy' -range '1.1,1.3|*' -range '1
 t 'new face for bg change' -in '\e[45mxxx\e[41myyy' -range '1.1,1.3|*' -range '1.4,1.6|*'
 t 'merges ranges at BOF' -in '\e[32m\e[1mxxx' -range '1.1,1.3|green+b'
 t 'merges ranges' -in 'y\e[32m\e[1mxxx' -range '1.2,1.4|green+b'
-#t 'new face for attr change'
 t 'no new face if no change' -in '\e[31mxxx\e[31myyy' -range '1.1,1.6|*'
 t 'handles change at 2.1' -in 'xy\n\e[31mxxx' -range '2.1,2.3|*'
 t 'handles change at EOL' -in 'xy\e[31m\nxxx' -range '1.3,2.3|*'
