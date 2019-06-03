@@ -90,12 +90,6 @@ t() {
             fi
             shift 2
             ;;
-        -no-range)
-            if hasGlob "$2" "${TEST_RANGES[@]}"; then
-                fail "$1" "$2"
-            fi
-            shift 2
-            ;;
         -no-ranges)
             if hasGlob "*|*" "${TEST_RANGES[@]}"; then
                 fail "$1"
