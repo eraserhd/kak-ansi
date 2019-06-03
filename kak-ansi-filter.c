@@ -280,42 +280,38 @@ void add_escape_char(wchar_t ch)
 
 bool handle_escape_char(wchar_t ch)
 {
-    if (ch == 0x0e && escape_sequence_length == 0)
+    switch (escape_sequence_length)
     {
-        in_G1_character_set = true;
-        return true;
-    }
-    if (ch == 0x0f && escape_sequence_length == 0)
-    {
-        in_G1_character_set = false;
-        return true;
-    }
-    if (ch == 0x1b && escape_sequence_length == 0)
-    {
-        add_escape_char(ch);
-        return true;
-    }
-    if (ch == L'[' && escape_sequence_length == 1)
-    {
-        add_escape_char(ch);
-        return true;
-    }
-    if (ch == L'(' && escape_sequence_length == 1)
-    {
-        add_escape_char(ch);
-        return true;
-    }
-    if (ch == L'0' && escape_sequence_length == 2 && escape_sequence[1] == L'(')
-    {
-        add_escape_char(ch);
-        process_escape_sequence(escape_sequence);
-        escape_sequence_length = 0;
-        return true;
-    }
-    if ((ch == L';' || iswdigit(ch)) && escape_sequence_length > 1)
-    {
-        add_escape_char(ch);
-        return true;
+    case 0:
+        switch (ch)
+        {
+        case 0x0e:
+            in_G1_character_set = true;
+            return true;
+        case 0x0f:
+            in_G1_character_set = false;
+            return true;
+        case 0x1b:
+            add_escape_char(ch);
+            return true;
+        }
+        break;
+    case 1:
+        switch (ch)
+        {
+        case L'[':
+        case L'(':
+            add_escape_char(ch);
+            return true;
+        }
+        break;
+    default:
+        if (escape_sequence[1] == L'[' && (ch == L';' || iswdigit(ch)))
+        {
+            add_escape_char(ch);
+            return true;
+        }
+        break;
     }
     if (escape_sequence_length > 1)
     {
