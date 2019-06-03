@@ -266,8 +266,10 @@ void process_escape_sequence(wchar_t* seq)
         return;
     if (seq[1] == L'[' && seq[wcslen(seq)-1] == 'm')
         process_ansi_escape(seq);
-    if (!wcscmp(seq, L"\x1B(0"))
+    else if (!wcscmp(seq, L"\x1B(0"))
         in_G1_character_set = true;
+    else if (!wcscmp(seq, L"\x1B(B"))
+        in_G1_character_set = false;
 }
 
 void add_escape_char(wchar_t ch)
