@@ -347,9 +347,23 @@ wchar_t translate_char(wchar_t ch)
     return ch;
 }
 
+size_t byte_count(wchar_t ch)
+{
+    char buf[MB_CUR_MAX];
+    mbstate_t mbs;
+    size_t count;
+    mbsinit(&mbs);
+    count = wcrtomb(buf, ch, &mbs);
+    if (count == (size_t)-1)
+        return 1;
+    else
+        return count;
+}
+
 void display_char(wchar_t ch)
 {
-    putwchar(translate_char(ch));
+    ch = translate_char(ch);
+    putwchar(ch);
 
     previous_char_coord = current_coord;
     if (ch == L'\n')
@@ -358,7 +372,7 @@ void display_char(wchar_t ch)
         current_coord.column = 1;
     }
     else
-        ++current_coord.column;
+        current_coord.column += byte_count(ch);
 }
 
 int main(int argc, char* argv[])
