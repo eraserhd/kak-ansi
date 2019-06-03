@@ -283,6 +283,11 @@ bool handle_escape_char(wchar_t ch)
         in_G1_character_set = true;
         return true;
     }
+    if (ch == 0x0f && escape_sequence_length == 0)
+    {
+        in_G1_character_set = false;
+        return true;
+    }
     if (ch == 0x1b && escape_sequence_length == 0)
     {
         add_escape_char(ch);
