@@ -67,6 +67,20 @@ define-command \
     set-option buffer ansi_color_ranges %val{timestamp}
 }
 
+# This is a work-around for https://github.com/mawww/kakoune/issues/2946
+declare-option -hidden bool ansi_buffer_initialized false
+
 hook -group ansi global BufCreate '\*stdin\*' %{
-    hook -once buffer NormalIdle '' ansi-render
+    hook -group ansi buffer BufReadFifo .* %{
+        evaluate-commands -draft %sh{
+            if [ "$kak_opt_ansi_buffer_initialized" = "true" ]; then
+                printf "select %s\n" "$kak_hook_param"
+                printf "execute-keys 'Z<a-:><a-;>gH<a-z>u'\n"
+                printf "ansi-render-selection\n"
+            else
+                printf 'ansi-render\n'
+                printf 'set-option buffer ansi_buffer_initialized true\n'
+            fi
+        }
+    }
 }
