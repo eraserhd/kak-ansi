@@ -71,6 +71,14 @@ define-command \
 declare-option -hidden bool ansi_buffer_initialized false
 
 hook -group ansi global BufCreate '\*stdin\*' %{
+    # This hook is part of the work-around for short text
+    hook -once -group ansi buffer NormalIdle .* %{
+        evaluate-commands -draft %sh{
+            if ! [ "$kak_opt_ansi_buffer_initialized" = "true" ]; then
+                printf 'ansi-render\n'
+            fi
+        }
+    }
     hook -group ansi buffer BufReadFifo .* %{
         evaluate-commands -draft %sh{
             if [ "$kak_opt_ansi_buffer_initialized" = "true" ]; then
