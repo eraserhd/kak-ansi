@@ -4,6 +4,7 @@ let
   kak-ansi = pkgs.callPackage ./derivation.nix {};
 in {
   test = pkgs.runCommandNoCC "kak-ansi-test" {} ''
-    true
+    : ${kak-ansi}
+    mkdir -p $out
   '';
 }
