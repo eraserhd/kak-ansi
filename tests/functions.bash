@@ -122,4 +122,4 @@ summarize() {
     fi
 }
 
-$CC -g -o kak-ansi-filter kak-ansi-filter.c || exit $?
+make CFLAGS='-g' || exit $?
