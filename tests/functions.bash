@@ -117,6 +117,9 @@ summarize() {
         color="$(printf '\e[31;1m')"
     fi
     printf '\n%s%d tests, %d failed.\e[0m\n' "$color" $TEST_COUNT $TESTS_FAILED
+    if (( TESTS_FAILED > 0 )); then
+        exit 1
+    fi
 }
 
 $CC -g -o kak-ansi-filter kak-ansi-filter.c || exit $?
