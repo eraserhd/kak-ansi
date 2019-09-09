@@ -1,2 +1,3 @@
 tests/*/run-*
 kak-ansi-filter
+/result
