@@ -136,7 +136,7 @@ void format_face(char* s, size_t size, const Face* face)
     char fg[64], bg[64], attrs[64];
     if (face->background == DEFAULT)
     {
-        snprintf(s, size, "%s%s", 
+        snprintf(s, size, "%s%s",
                  format_color(fg, face->foreground),
                  format_attrs(attrs, face->attributes));
     }
