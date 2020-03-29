@@ -1,7 +1,11 @@
 { nixpkgs ? (import ./nixpkgs.nix), ... }:
 let
-  pkgs = import nixpkgs { config = {}; };
-  kak-ansi = pkgs.callPackage ./derivation.nix {};
+  pkgs = import nixpkgs {
+    config = {};
+    overlays = [
+      (import ./overlay.nix)
+    ];
+  };
 in {
   test = pkgs.stdenv.mkDerivation {
     name = "kak-ansi-tests-2019.09.09";
