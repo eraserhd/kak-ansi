@@ -67,7 +67,7 @@ define-command \
     set-option buffer ansi_color_ranges %val{timestamp}
 }
 
-hook -group ansi global BufCreate '\*stdin\*' %{
+hook -group ansi global BufCreate '\*stdin(?:-\d+)?\*' %{
     hook -group ansi buffer BufReadFifo .* %{
         evaluate-commands -draft %sh{
             printf "select %s\n" "$kak_hook_param"
