@@ -67,7 +67,11 @@ define-command \
     set-option buffer ansi_color_ranges %val{timestamp}
 }
 
-hook -group ansi global BufCreate '\*stdin(?:-\d+)?\*' %{
+define-command \
+    -docstring %{ansi-enable: render buffer and enable rendering new fifo data for current buffer.} \
+    -params 0 \
+    ansi-enable %{
+    ansi-render
     hook -group ansi buffer BufReadFifo .* %{
         evaluate-commands -draft %sh{
             printf "select %s\n" "$kak_hook_param"
@@ -76,3 +80,5 @@ hook -group ansi global BufCreate '\*stdin(?:-\d+)?\*' %{
         }
     }
 }
+
+hook -group ansi global BufCreate '\*stdin(?:-\d+)?\*' ansi-enable
