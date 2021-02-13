@@ -80,4 +80,11 @@ define-command \
     }
 }
 
+define-command \
+    -docstring %{ansi-disable: stop rendering new fifo content in current buffer.}
+    -params 0 \
+    ansi-disable %{
+        remove-hooks buffer ansi
+    }
+
 hook -group ansi global BufCreate '\*stdin(?:-\d+)?\*' ansi-enable
