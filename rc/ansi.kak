@@ -68,10 +68,9 @@ define-command \
 }
 
 define-command \
-    -docstring %{ansi-enable: render buffer and enable rendering new fifo data for current buffer.} \
+    -docstring %{ansi-enable: start rendering new fifo data in current buffer.} \
     -params 0 \
     ansi-enable %{
-    ansi-render
     hook -group ansi buffer BufReadFifo .* %{
         evaluate-commands -draft %sh{
             printf "select %s\n" "$kak_hook_param"
