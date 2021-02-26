@@ -81,7 +81,7 @@ define-command \
 }
 
 define-command \
-    -docstring %{ansi-disable: stop rendering new fifo content in current buffer.}
+    -docstring %{ansi-disable: stop rendering new fifo content in current buffer.} \
     -params 0 \
     ansi-disable %{
         remove-hooks buffer ansi
