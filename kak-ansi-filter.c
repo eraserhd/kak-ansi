@@ -363,7 +363,10 @@ size_t byte_count(wchar_t ch)
 void display_char(wchar_t ch)
 {
     ch = translate_char(ch);
-    putwchar(ch);
+    if (putwchar(ch) == WEOF)
+    {
+        perror("putwchar");
+    }
 
     previous_char_end = current_coord;
     previous_char_end.column += byte_count(ch) - 1;
@@ -380,7 +383,7 @@ int main(int argc, char* argv[])
 {
     wchar_t ch;
 
-    setlocale(LC_ALL, "en_US.utf8");
+    setlocale(LC_ALL, "");
 
     for (int i = 1; i < argc; i++)
     {
