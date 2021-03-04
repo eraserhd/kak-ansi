@@ -20,34 +20,32 @@ After highlighters are added to colorize the buffer, the ANSI codes
 are removed.} \
     -params 0 \
     ansi-render-selection %{
-    evaluate-commands -draft %{
-        try %{
-            add-highlighter buffer/ansi ranges ansi_color_ranges
-            set-option buffer ansi_color_ranges %val{timestamp}
-        }
-        set-option buffer ansi_command_file %sh{mktemp}
-        set-option buffer ansi_start %sh{
-            tmp="$kak_selection_desc"
-            anchor_line="${tmp%%[.,]*}"
-            tmp="${tmp#*[.,]}"
-            anchor_column="${tmp%%[.,]*}"
-            tmp="${tmp#*[.,]}"
-            cursor_line="${tmp%%[.,]*}"
-            tmp="${tmp#*[.,]}"
-            cursor_column="$tmp"
-            if [ $anchor_line -lt $cursor_line ]; then
-                printf '%d.%d' "$anchor_line" "$anchor_column"
-            elif [ $anchor_line -eq $cursor_line ] && [ $anchor_column -lt $cursor_column ]; then
-                printf '%d.%d' "$anchor_line" "$anchor_column"
-            else
-                printf '%d.%d' "$cursor_line" "$cursor_column"
-            fi
-        }
-        execute-keys "|%opt{ansi_filter} -start %opt{ansi_start} 2>%opt{ansi_command_file}<ret>"
-        update-option buffer ansi_color_ranges
-        source "%opt{ansi_command_file}"
-        nop %sh{ rm -f "$kak_opt_ansi_command_file" }
+    try %{
+        add-highlighter buffer/ansi ranges ansi_color_ranges
+        set-option buffer ansi_color_ranges %val{timestamp}
     }
+    set-option buffer ansi_command_file %sh{mktemp}
+    set-option buffer ansi_start %sh{
+        tmp="$kak_selection_desc"
+        anchor_line="${tmp%%[.,]*}"
+        tmp="${tmp#*[.,]}"
+        anchor_column="${tmp%%[.,]*}"
+        tmp="${tmp#*[.,]}"
+        cursor_line="${tmp%%[.,]*}"
+        tmp="${tmp#*[.,]}"
+        cursor_column="$tmp"
+        if [ $anchor_line -lt $cursor_line ]; then
+            printf '%d.%d' "$anchor_line" "$anchor_column"
+        elif [ $anchor_line -eq $cursor_line ] && [ $anchor_column -lt $cursor_column ]; then
+            printf '%d.%d' "$anchor_line" "$anchor_column"
+        else
+            printf '%d.%d' "$cursor_line" "$cursor_column"
+        fi
+    }
+    execute-keys "|%opt{ansi_filter} -start %opt{ansi_start} 2>%opt{ansi_command_file}<ret>"
+    update-option buffer ansi_color_ranges
+    source "%opt{ansi_command_file}"
+    nop %sh{ rm -f "$kak_opt_ansi_command_file" }
 }
 
 define-command \
