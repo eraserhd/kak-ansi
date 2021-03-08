@@ -382,23 +382,33 @@ void display_char(wchar_t ch)
 int main(int argc, char* argv[])
 {
     wchar_t ch;
+    Coord other_coord;
 
     setlocale(LC_ALL, "");
 
     for (int i = 1; i < argc; i++)
     {
-        if (!strcmp(argv[i], "-start"))
+        if (!strcmp(argv[i], "-range"))
         {
             ++i;
             if (i >= argc)
             {
-                fwprintf(stderr, L"fail \"kak-ansi-filter: -start needs an argument\"\n");
+                fwprintf(stderr, L"fail \"kak-ansi-filter: -range needs an argument\"\n");
                 exit(1);
             }
-            if (sscanf(argv[i], "%d.%d", &current_coord.line, &current_coord.column) != 2)
+            if (sscanf(argv[i], "%d.%d,%d.%d", &current_coord.line, &current_coord.column, &other_coord.line, &other_coord.column) != 4)
             {
-                fwprintf(stderr, L"fail \"kak-ansi-filter: invalid value for -start\"\n");
+                fwprintf(stderr, L"fail \"kak-ansi-filter: invalid value for -range\"\n");
                 exit(1);
+            }
+            if (current_coord.line > other_coord.line || (current_coord.line == other_coord.line && current_coord.column > other_coord.column))
+            {
+                int tmp = current_coord.line;
+                current_coord.line = other_coord.line;
+                other_coord.line = tmp;
+                tmp = current_coord.column;
+                current_coord.column = other_coord.column;
+                other_coord.column = tmp;
             }
         }
         else

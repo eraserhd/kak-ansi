@@ -1,6 +1,5 @@
 declare-option -hidden range-specs ansi_color_ranges
 declare-option -hidden str ansi_command_file
-declare-option -hidden str ansi_start
 declare-option -hidden str ansi_filter %sh{
     filterdir="$(dirname $kak_source)/.."
     filter="${filterdir}/kak-ansi-filter"
@@ -25,24 +24,7 @@ are removed.} \
         set-option buffer ansi_color_ranges %val{timestamp}
         set-option buffer ansi_command_file %sh{mktemp}
     }
-    set-option buffer ansi_start %sh{
-        tmp="$kak_selection_desc"
-        anchor_line="${tmp%%[.,]*}"
-        tmp="${tmp#*[.,]}"
-        anchor_column="${tmp%%[.,]*}"
-        tmp="${tmp#*[.,]}"
-        cursor_line="${tmp%%[.,]*}"
-        tmp="${tmp#*[.,]}"
-        cursor_column="$tmp"
-        if [ $anchor_line -lt $cursor_line ]; then
-            printf '%d.%d' "$anchor_line" "$anchor_column"
-        elif [ $anchor_line -eq $cursor_line ] && [ $anchor_column -lt $cursor_column ]; then
-            printf '%d.%d' "$anchor_line" "$anchor_column"
-        else
-            printf '%d.%d' "$cursor_line" "$cursor_column"
-        fi
-    }
-    execute-keys "|%opt{ansi_filter} -start %opt{ansi_start} 2>%opt{ansi_command_file}<ret>"
+    execute-keys "|%opt{ansi_filter} -range %val{selection_desc} 2>%opt{ansi_command_file}<ret>"
     update-option buffer ansi_color_ranges
     source "%opt{ansi_command_file}"
 }

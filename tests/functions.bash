@@ -96,7 +96,7 @@ t() {
             ;;
         esac
     done
-    
+
     if $ranges_specified; then
         if (( ${#TEST_RANGES[@]} != range_count )); then
             fail 'count of ranges'
