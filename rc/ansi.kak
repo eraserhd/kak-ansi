@@ -23,8 +23,8 @@ are removed.} \
     try %{
         add-highlighter buffer/ansi ranges ansi_color_ranges
         set-option buffer ansi_color_ranges %val{timestamp}
+        set-option buffer ansi_command_file %sh{mktemp}
     }
-    set-option buffer ansi_command_file %sh{mktemp}
     set-option buffer ansi_start %sh{
         tmp="$kak_selection_desc"
         anchor_line="${tmp%%[.,]*}"
@@ -45,7 +45,6 @@ are removed.} \
     execute-keys "|%opt{ansi_filter} -start %opt{ansi_start} 2>%opt{ansi_command_file}<ret>"
     update-option buffer ansi_color_ranges
     source "%opt{ansi_command_file}"
-    nop %sh{ rm -f "$kak_opt_ansi_command_file" }
 }
 
 define-command \
