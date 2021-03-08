@@ -71,7 +71,7 @@ define-command \
     hook -group ansi buffer BufReadFifo .* %{
         evaluate-commands -draft %{
             select "%val{hook_param}"
-            execute-keys 'Z<a-:><a-;>gH<a-z>u'
+            execute-keys '<a-:><a-;>Gh'
             ansi-render-selection
         }
     }
