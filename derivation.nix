@@ -2,7 +2,7 @@
 
 stdenv.mkDerivation rec {
   name = "kak-ansi";
-  version = "0.2.0";
+  version = "0.2.2";
   src = ./.;
   installPhase = ''
     mkdir -p $out/bin $out/share/kak/autoload/plugins/
