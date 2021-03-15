@@ -308,7 +308,7 @@ bool handle_escape_char(wchar_t ch)
         }
         break;
     default:
-        if (escape_sequence[1] == L'[' && (ch == L';' || iswdigit(ch)))
+        if (escape_sequence[1] == L'[' && (ch == L';' || ch == L':' || iswdigit(ch)))
         {
             add_escape_char(ch);
             return true;
