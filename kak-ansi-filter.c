@@ -280,7 +280,7 @@ void add_escape_char(wchar_t ch)
     escape_sequence[escape_sequence_length] = L'\0';
 }
 
-bool handle_escape_char(wchar_t ch)
+wchar_t handle_escape_char(wchar_t ch)
 {
     switch (escape_sequence_length)
     {
@@ -289,13 +289,13 @@ bool handle_escape_char(wchar_t ch)
         {
         case 0x0e:
             in_G1_character_set = true;
-            return true;
+            return WEOF;
         case 0x0f:
             in_G1_character_set = false;
-            return true;
+            return WEOF;
         case 0x1b:
             add_escape_char(ch);
-            return true;
+            return WEOF;
         }
         break;
     case 1:
@@ -304,14 +304,14 @@ bool handle_escape_char(wchar_t ch)
         case L'[':
         case L'(':
             add_escape_char(ch);
-            return true;
+            return WEOF;
         }
         break;
     default:
         if (escape_sequence[1] == L'[' && (ch == L';' || ch == L':' || iswdigit(ch)))
         {
             add_escape_char(ch);
-            return true;
+            return WEOF;
         }
         break;
     }
@@ -320,9 +320,9 @@ bool handle_escape_char(wchar_t ch)
         add_escape_char(ch);
         process_escape_sequence(escape_sequence);
         escape_sequence_length = 0;
-        return true;
+        return WEOF;
     }
-    return false;
+    return ch;
 }
 
 wchar_t translate_char(wchar_t ch)
@@ -420,7 +420,7 @@ int main(int argc, char* argv[])
     fwprintf(stderr, L"set-option -add buffer ansi_color_ranges");
     while ((ch = fgetwc(stdin)) != WEOF)
     {
-        if (handle_escape_char(ch))
+        if (WEOF == (ch = handle_escape_char(ch)))
             continue;
         if (WEOF == (ch = translate_char(ch)))
             continue;
