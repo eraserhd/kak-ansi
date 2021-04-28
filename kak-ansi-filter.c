@@ -378,9 +378,13 @@ void display_char(wchar_t ch)
         current_coord.column += byte_count(ch);
 }
 
+wchar_t overstrike_last_char = WEOF;
+
 wchar_t handle_overstrike(wchar_t ch)
 {
-    return ch;
+    wchar_t tmp = overstrike_last_char;
+    overstrike_last_char = ch;
+    return tmp;
 }
 
 int main(int argc, char* argv[])
@@ -425,13 +429,17 @@ int main(int argc, char* argv[])
     fwprintf(stderr, L"set-option -add buffer ansi_color_ranges");
     while ((ch = fgetwc(stdin)) != WEOF)
     {
-        if (WEOF == (ch = handle_escape_char(ch)))
-            continue;
-        if (WEOF == (ch = translate_char(ch)))
-            continue;
-        if (WEOF == (ch = handle_overstrike(ch)))
-            continue;
-        display_char(ch);
+        if (WEOF != ch) ch = handle_overstrike(ch);
+        if (WEOF != ch) ch = handle_escape_char(ch);
+        if (WEOF != ch) ch = translate_char(ch);
+        if (WEOF != ch) display_char(ch);
+    }
+    if (WEOF != overstrike_last_char)
+    {
+        ch = overstrike_last_char;
+        if (WEOF != ch) ch = handle_escape_char(ch);
+        if (WEOF != ch) ch = translate_char(ch);
+        if (WEOF != ch) display_char(ch);
     }
     emit_face(&current_face);
     fwprintf(stderr, L"\n");
