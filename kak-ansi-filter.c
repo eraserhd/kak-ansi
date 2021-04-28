@@ -362,7 +362,6 @@ size_t byte_count(wchar_t ch)
 
 void display_char(wchar_t ch)
 {
-    ch = translate_char(ch);
     if (putwchar(ch) == WEOF)
     {
         perror("putwchar");
@@ -422,6 +421,8 @@ int main(int argc, char* argv[])
     while ((ch = fgetwc(stdin)) != WEOF)
     {
         if (handle_escape_char(ch))
+            continue;
+        if (WEOF == (ch = translate_char(ch)))
             continue;
         display_char(ch);
     }
