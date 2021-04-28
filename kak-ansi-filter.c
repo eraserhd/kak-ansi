@@ -378,6 +378,11 @@ void display_char(wchar_t ch)
         current_coord.column += byte_count(ch);
 }
 
+wchar_t handle_overstrike(wchar_t ch)
+{
+    return ch;
+}
+
 int main(int argc, char* argv[])
 {
     wchar_t ch;
@@ -423,6 +428,8 @@ int main(int argc, char* argv[])
         if (WEOF == (ch = handle_escape_char(ch)))
             continue;
         if (WEOF == (ch = translate_char(ch)))
+            continue;
+        if (WEOF == (ch = handle_overstrike(ch)))
             continue;
         display_char(ch);
     }
