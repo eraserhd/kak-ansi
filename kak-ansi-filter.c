@@ -378,13 +378,32 @@ void display_char(wchar_t ch)
         current_coord.column += byte_count(ch);
 }
 
+bool    overstrike_has_backspace = false;
 wchar_t overstrike_last_char = WEOF;
 
 wchar_t handle_overstrike(wchar_t ch)
 {
-    wchar_t tmp = overstrike_last_char;
-    overstrike_last_char = ch;
-    return tmp;
+    if (overstrike_has_backspace)
+    {
+        bool bold = (ch == overstrike_last_char);
+        bool underline = (ch == '_' || overstrike_last_char == '_');
+        if ('_' == ch)
+            ch = overstrike_last_char;
+        overstrike_has_backspace = false;
+        overstrike_last_char = WEOF;
+        return ch;
+    }
+    else if (L'\b' == ch)
+    {
+        overstrike_has_backspace = true;
+        return WEOF;
+    }
+    else
+    {
+        wchar_t tmp = overstrike_last_char;
+        overstrike_last_char = ch;
+        return tmp;
+    }
 }
 
 int main(int argc, char* argv[])
@@ -434,9 +453,8 @@ int main(int argc, char* argv[])
         if (WEOF != ch) ch = translate_char(ch);
         if (WEOF != ch) display_char(ch);
     }
-    if (WEOF != overstrike_last_char)
+    if (WEOF != (ch = overstrike_last_char))
     {
-        ch = overstrike_last_char;
         if (WEOF != ch) ch = handle_escape_char(ch);
         if (WEOF != ch) ch = translate_char(ch);
         if (WEOF != ch) display_char(ch);

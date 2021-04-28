@@ -73,4 +73,15 @@ t '\e[7m sets reverse' -in '\e[7mxxx' -range '1.1,1.3|default+r'
 t '\e[0m resets all attributes' -in '\e[7mx\e[0mx' -range '1.1,1.1|default+r'
 t '\e[27m resets inverse' -in '\e[7mx\e[27mx' -range '1.1,1.1|default+r'
 
+h2 "Old Line Printer Escapes"
+h3 "Bold Overstrike"
+t 'removes backspaces' -in ' H\bHe\bel\bll\blo\bo ' -out ' Hello '
+
+h3 "Underline Overstrike"
+t 'removes underscore-backspace' -in ' _\bH_\be_\bl_\bl_\bo ' -out ' Hello '
+t 'removes backspace-underscore' -in ' H\b_e\b_l\b_l\b_o\b_ ' -out ' Hello '
+
+h3 "Other Overstrikes"
+t 'are discarded' -in 'X\bY' -out 'Y'
+
 summarize
