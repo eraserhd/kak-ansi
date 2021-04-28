@@ -396,6 +396,10 @@ wchar_t handle_overstrike(wchar_t ch)
             ch = overstrike_last_char;
         overstrike_has_backspace = false;
         overstrike_last_char = WEOF;
+        if (bold)
+            current_face.attributes |= BOLD;
+        if (underline)
+            current_face.attributes |= UNDERLINE;
         return ch;
     }
     else if (L'\b' == ch)
