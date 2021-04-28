@@ -83,6 +83,10 @@ t 'removes underscore-backspace' -in ' _\bH_\be_\bl_\bl_\bo ' -out ' Hello '
 t 'removes backspace-underscore' -in ' H\b_e\b_l\b_l\b_o\b_ ' -out ' Hello '
 t 'sets and resets underline' -in ' H\b__\bel\b_lo ' -range '1.2,1.4|default+u'
 
+h3 "Combined Overstrike"
+t 'removes combined overstrikes' -in ' H\bH\b__\be\bel\b_\bllo ' -out ' Hello '
+t 'sets and resets bold and underline' -in ' H\bH\b__\be\bel\b_\bllo ' -range '1.2,1.4|default+ub'
+
 h3 "Other Overstrikes"
 t 'are discarded' -in 'X\bY' -out 'Y'
 
