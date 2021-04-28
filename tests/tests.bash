@@ -76,11 +76,12 @@ t '\e[27m resets inverse' -in '\e[7mx\e[27mx' -range '1.1,1.1|default+r'
 h2 "Old Line Printer Escapes"
 h3 "Bold Overstrike"
 t 'removes backspaces' -in ' H\bHe\bel\bll\blo\bo ' -out ' Hello '
-t 'sets boldface' -in ' H\bHe\be' -range '1.2,1.3|default+b'
+t 'sets and resets boldface' -in ' H\bHe\bello' -range '1.2,1.3|default+b'
 
 h3 "Underline Overstrike"
 t 'removes underscore-backspace' -in ' _\bH_\be_\bl_\bl_\bo ' -out ' Hello '
 t 'removes backspace-underscore' -in ' H\b_e\b_l\b_l\b_o\b_ ' -out ' Hello '
+t 'sets and resets underline' -in ' H\b__\bel\b_lo ' -range '1.2,1.4|default+u'
 
 h3 "Other Overstrikes"
 t 'are discarded' -in 'X\bY' -out 'Y'

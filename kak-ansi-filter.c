@@ -383,8 +383,10 @@ void display_char(wchar_t ch)
         current_coord.column += byte_count(ch);
 }
 
-bool    overstrike_has_backspace = false;
-wchar_t overstrike_last_char = WEOF;
+bool       overstrike_want_attribute_reset = false;
+Attributes overstrike_previous_attributes;
+bool       overstrike_has_backspace = false;
+wchar_t    overstrike_last_char = WEOF;
 
 wchar_t handle_overstrike(wchar_t ch)
 {
@@ -396,6 +398,11 @@ wchar_t handle_overstrike(wchar_t ch)
             ch = overstrike_last_char;
         overstrike_has_backspace = false;
         overstrike_last_char = WEOF;
+        if (!overstrike_want_attribute_reset)
+        {
+            overstrike_want_attribute_reset = true;
+            overstrike_previous_attributes = current_face.attributes;
+        }
         if (bold)
             current_face.attributes |= BOLD;
         if (underline)
@@ -409,6 +416,11 @@ wchar_t handle_overstrike(wchar_t ch)
     }
     else
     {
+        if (overstrike_want_attribute_reset)
+        {
+            overstrike_want_attribute_reset = false;
+            current_face.attributes = overstrike_previous_attributes;
+        }
         wchar_t tmp = overstrike_last_char;
         overstrike_last_char = ch;
         return tmp;
