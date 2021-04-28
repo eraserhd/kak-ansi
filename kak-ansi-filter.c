@@ -65,6 +65,12 @@ Face current_face =
     .background = DEFAULT,
     .attributes = 0
 };
+Face previous_face =
+{
+    .foreground = DEFAULT,
+    .background = DEFAULT,
+    .attributes = 0
+};
 
 Coord   current_coord       = { .line = 1, .column = 1 };
 Coord   previous_char_end   = { .line = 1, .column = 0 };
@@ -211,8 +217,6 @@ void process_ansi_escape(wchar_t* seq)
 {
     int codes[512];
     int code_count = parse_codes(seq, codes, sizeof(codes)/sizeof(codes[0]));
-    Face previous_face = current_face;
-
     for (int i = 0; i < code_count;)
     {
         int code = codes[i++];
@@ -252,12 +256,6 @@ void process_ansi_escape(wchar_t* seq)
     }
     if (code_count == 0)
         reset();
-
-    if (!faces_equal(&previous_face, &current_face))
-    {
-        emit_face(&previous_face);
-        face_start_coord = current_coord;
-    }
 }
 
 void process_escape_sequence(wchar_t* seq)
@@ -365,6 +363,13 @@ void display_char(wchar_t ch)
     if (putwchar(ch) == WEOF)
     {
         perror("putwchar");
+    }
+
+    if (!faces_equal(&previous_face, &current_face))
+    {
+        emit_face(&previous_face);
+        face_start_coord = current_coord;
+        memcpy(&previous_face, &current_face, sizeof(Face));
     }
 
     previous_char_end = current_coord;
