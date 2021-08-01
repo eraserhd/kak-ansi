@@ -290,6 +290,13 @@ wchar_t handle_escape_char(wchar_t ch)
     case 0:
         switch (ch)
         {
+        case L'\r':
+            /*
+             * jest ANSI output uses CR to send the cursor to the BOL.  We
+             * don't want to lose or overdraw output, since we are a pager
+             * filter and not a full terminal, so let's just delete the CR.
+             */
+            return WEOF;
         case 0x0e:
             in_G1_character_set = true;
             return WEOF;
