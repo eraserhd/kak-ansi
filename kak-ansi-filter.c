@@ -311,6 +311,7 @@ wchar_t handle_escape_char(wchar_t ch)
     case 1:
         switch (ch)
         {
+        case L']':
         case L'[':
         case L'(':
             add_escape_char(ch);
@@ -318,10 +319,23 @@ wchar_t handle_escape_char(wchar_t ch)
         }
         break;
     default:
-        if (escape_sequence[1] == L'[' && (ch == L';' || ch == L':' || iswdigit(ch)))
+        switch (escape_sequence[1])
         {
-            add_escape_char(ch);
-            return WEOF;
+        case L']':
+            /* OSC escapes, used by shell integration */
+            if (ch != L'\\' || escape_sequence[escape_sequence_length-1] != 0x1b)
+            {
+                add_escape_char(ch);
+                return WEOF;
+            }
+            break;
+        case L'[':
+            if (ch == L';' || ch == L':' || iswdigit(ch))
+            {
+                add_escape_char(ch);
+                return WEOF;
+            }
+            break;
         }
         break;
     }

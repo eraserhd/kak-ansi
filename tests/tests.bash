@@ -90,4 +90,7 @@ t 'sets and resets bold and underline' -in ' H\bH\b__\be\bel\b_\bllo ' -range '1
 h3 "Other Overstrikes"
 t 'are discarded' -in 'X\bY' -out 'Y'
 
+h2 "Shell Integration"
+t 'ignores shell integration esapes' -in 'hello\e]133;A\e\\world' -out 'helloworld'
+
 summarize
