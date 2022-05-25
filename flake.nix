@@ -32,7 +32,9 @@
         };
     })) // {
       overlays.default = final: prev: {
-        kak-ansi = prev.callPackage ./derivation.nix {};
+        kakounePlugins = prev.kakounePlugins // {
+          kak-ansi = prev.callPackage ./derivation.nix {};
+        };
       };
     };
 }
