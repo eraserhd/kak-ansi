@@ -14,10 +14,21 @@
           inherit kak-ansi;
         };
         checks = {
-          test = pkgs.runCommandNoCC "kak-ansi-test" {} ''
-            mkdir -p $out
-            : ${kak-ansi}
-          '';
+          test = pkgs.stdenv.mkDerivation {
+            name = "kak-ansi-tests-2019.09.09";
+            src = ./.;
+            buildPhase = let
+              localeArchive = if pkgs.stdenv.isDarwin
+                              then ""
+                              else "LOCALE_ARCHIVE=${pkgs.glibcLocales}/lib/locale/locale-archive";
+            in ''
+              rm -f kak-ansi-filter
+              LC_ALL=en_US.UTF-8 ${localeArchive} ${pkgs.bash}/bin/bash tests/tests.bash
+            '';
+            installPhase = ''
+              touch $out
+            '';
+          };
         };
     })) // {
       overlays.default = final: prev: {
