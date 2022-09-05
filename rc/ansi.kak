@@ -4,7 +4,8 @@ declare-option -hidden str ansi_filter %sh{
     filterdir="$(dirname $kak_source)/.."
     filter="${filterdir}/kak-ansi-filter"
     if ! [ -x "${filter}" ]; then
-        ( cd "$filterdir" && ${CC-cc} -o kak-ansi-filter kak-ansi-filter.c )
+        echo "kak-ansi: Compiling kak-ansi-filter.c" >&2
+        ( set -x; cd "$filterdir" && ${CC-cc} -o kak-ansi-filter kak-ansi-filter.c )
         if ! [ -x "${filter}" ]; then
             filter=$(command -v cat)
         fi
