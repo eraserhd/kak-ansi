@@ -20,12 +20,18 @@ After highlighters are added to colorize the buffer, the ANSI codes
 are removed.} \
     -params 0 \
     ansi-render-selection %{
-    try %{
-        add-highlighter buffer/ansi ranges ansi_color_ranges
-        set-option buffer ansi_color_ranges %val{timestamp}
-        set-option buffer ansi_command_file %sh{mktemp}
-    }
-    execute-keys "|%opt{ansi_filter} -range %val{selection_desc} 2>%opt{ansi_command_file}<ret>"
+    try ansi-setup-buffer
+    ansi-render-selection-impl
+}
+define-command -hidden ansi-setup-buffer %{
+    add-highlighter buffer/ansi ranges ansi_color_ranges
+    set-option buffer ansi_color_ranges %val{timestamp}
+    set-option buffer ansi_command_file %sh{mktemp}
+}
+
+define-command -hidden ansi-render-selection-impl %{
+    set-register '|' "%opt{ansi_filter} -range %val{selection_desc} 2>%opt{ansi_command_file}"
+    execute-keys "|<ret>"
     update-option buffer ansi_color_ranges
     source "%opt{ansi_command_file}"
 }
@@ -51,10 +57,11 @@ define-command \
     -docstring %{ansi-enable: start rendering new fifo data in current buffer.} \
     -params 0 \
     ansi-enable %{
+    try ansi-setup-buffer
     hook -group ansi buffer BufReadFifo .* %{
         evaluate-commands -draft %{
             select "%val{hook_param}"
-            ansi-render-selection
+            ansi-render-selection-impl
         }
     }
 }
