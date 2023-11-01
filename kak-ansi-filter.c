@@ -330,7 +330,7 @@ wchar_t handle_escape_char(wchar_t ch)
             }
             break;
         case L'[':
-            if (ch == L';' || ch == L':' || iswdigit(ch))
+            if (ch == L';' || ch == L':' || iswdigit(ch) || (escape_sequence_length == 2 && ch == '?'))
             {
                 add_escape_char(ch);
                 return WEOF;
