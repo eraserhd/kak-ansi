@@ -93,4 +93,7 @@ t 'are discarded' -in 'X\bY' -out 'Y'
 h2 "Shell Integration"
 t 'ignores shell integration esapes' -in 'hello\e]133;A\e\\world' -out 'helloworld'
 
+h2 "Common Private Modes"
+t 'ignores common private modes escapes' -in 'hello\e[?47hworld' -out 'helloworld'
+
 summarize

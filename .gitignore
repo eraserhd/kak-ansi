@@ -2,3 +2,4 @@ tests/*/run-*
 kak-ansi-filter
 /result
 .direnv
+*.dSYM

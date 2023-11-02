@@ -330,6 +330,12 @@ wchar_t handle_escape_char(wchar_t ch)
             }
             break;
         case L'[':
+            /* Private mode CSI */
+            if (escape_sequence_length == 2 && ch == L'?')
+            {
+                add_escape_char(ch);
+                return WEOF;
+            }
             if (ch == L';' || ch == L':' || iswdigit(ch))
             {
                 add_escape_char(ch);
