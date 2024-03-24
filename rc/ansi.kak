@@ -58,6 +58,8 @@ define-command \
     -params 0 \
     ansi-enable %{
     try ansi-setup-buffer
+    ansi-render
+    remove-hooks buffer ansi
     hook -group ansi buffer BufReadFifo .* %{
         evaluate-commands -draft %{
             select "%val{hook_param}"
