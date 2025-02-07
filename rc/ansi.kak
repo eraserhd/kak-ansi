@@ -27,6 +27,10 @@ define-command -hidden ansi-setup-buffer %{
     add-highlighter buffer/ansi ranges ansi_color_ranges
     set-option buffer ansi_color_ranges %val{timestamp}
     set-option buffer ansi_command_file %sh{mktemp}
+    hook -always -once buffer BufClose .* %{
+	    nop %sh{rm ${kak_opt_ansi_command_file}}
+	    set-option buffer ansi_command_file /dev/null
+    }
 }
 
 define-command -hidden ansi-render-selection-impl %{
