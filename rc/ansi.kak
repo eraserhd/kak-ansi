@@ -30,10 +30,12 @@ define-command -hidden ansi-setup-buffer %{
 }
 
 define-command -hidden ansi-render-selection-impl %{
-    set-register '|' "%opt{ansi_filter} -range %val{selection_desc} 2>%opt{ansi_command_file}"
-    execute-keys "|<ret>"
-    update-option buffer ansi_color_ranges
-    source "%opt{ansi_command_file}"
+    evaluate-commands -save-regs | %{
+        set-register '|' "%opt{ansi_filter} -range %val{selection_desc} 2>%opt{ansi_command_file}"
+        execute-keys "|<ret>"
+        update-option buffer ansi_color_ranges
+        source "%opt{ansi_command_file}"
+    }
 }
 
 define-command \
