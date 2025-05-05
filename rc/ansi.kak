@@ -39,6 +39,7 @@ define-command -hidden ansi-render-selection-impl %{
         execute-keys "|<ret>"
         update-option buffer ansi_color_ranges
         source "%opt{ansi_command_file}"
+        trigger-user-hook "AnsiColored=%val(selection_desc)"
     }
 }
 
