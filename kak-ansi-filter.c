@@ -235,8 +235,8 @@ void process_ansi_escape(wchar_t* seq)
             current_face.attributes &= ~(BOLD | DIM);
             break;
         case 90: case 91: case 92: case 93: case 94: case 95: case 96: case 97:
-            current_face.attributes |= BOLD;
-            /* fall through */
+            current_face.foreground = 8 + code % 10;
+            break;
         case 30: case 31: case 32: case 33: case 34: case 35: case 36: case 37:
             current_face.foreground = code % 10;
             break;
