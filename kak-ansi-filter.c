@@ -247,7 +247,8 @@ void process_ansi_escape(wchar_t* seq)
             current_face.foreground = DEFAULT;
             break;
         case 100: case 101: case 102: case 103: case 104: case 105: case 106: case 107:
-            /* fall through */
+            current_face.background = 8 + code % 10;
+            break;
         case 40: case 41: case 42: case 43: case 44: case 45: case 46: case 47:
             current_face.background = code % 10;
             break;
