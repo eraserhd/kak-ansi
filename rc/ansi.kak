@@ -93,7 +93,7 @@ hook -once -group ansi global KakBegin '.*' %{
         shift
         manout=$(mktemp "${TMPDIR:-/tmp}"/kak-man.XXXXXX)
         manerr=$(mktemp "${TMPDIR:-/tmp}"/kak-man.XXXXXX)
-        env MANWIDTH=${kak_window_range##* } man "$@" > "$manout" 2> "$manerr"
+        env MAN_KEEP_FORMATTING=1 MANWIDTH=${kak_window_range##* } man "$@" > "$manout" 2> "$manerr"
         retval=$?
 
         if [ "${retval}" -eq 0 ]; then
