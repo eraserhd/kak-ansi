@@ -324,7 +324,7 @@ wchar_t handle_escape_char(wchar_t ch)
         {
         case L']':
             /* OSC escapes, used by shell integration */
-            if (ch != L'\\' || escape_sequence[escape_sequence_length-1] != 0x1b)
+            if ((ch != L'\\' || escape_sequence[escape_sequence_length-1] != 0x1b) && ch != 0x07)
             {
                 add_escape_char(ch);
                 return WEOF;
