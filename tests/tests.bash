@@ -91,6 +91,8 @@ h3 "Other Overstrikes"
 t 'are discarded' -in 'X\bY' -out 'Y'
 
 h2 "Shell Integration"
+t 'ignores hyperlinks' -in 'editor: \e]8;;https://kakoune.org/\e\\kakoune\e]8;;\e\\' -out 'editor: kakoune'
+t 'ignores hyperlinks terminated by BEL' -in 'editor: \e]8;;https://kakoune.org/\akakoune\e]8;;\a' -out 'editor: kakoune'
 t 'ignores shell integration esapes' -in 'hello\e]133;A\e\\world' -out 'helloworld'
 
 h2 "Common Private Modes"
