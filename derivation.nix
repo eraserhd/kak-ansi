@@ -2,7 +2,7 @@
 
 stdenv.mkDerivation rec {
   name = "kak-ansi";
-  version = "0.2.8";
+  version = "0.3.0";
 
   src = ./.;
 
