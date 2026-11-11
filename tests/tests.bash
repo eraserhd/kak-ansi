@@ -94,6 +94,10 @@ h2 "Shell Integration"
 t 'ignores hyperlinks' -in 'editor: \e]8;;https://kakoune.org/\e\\kakoune\e]8;;\e\\' -out 'editor: kakoune'
 t 'ignores hyperlinks terminated by BEL' -in 'editor: \e]8;;https://kakoune.org/\akakoune\e]8;;\a' -out 'editor: kakoune'
 t 'ignores shell integration esapes' -in 'hello\e]133;A\e\\world' -out 'helloworld'
+long_uri="https://kakoune.org/$(printf 'a%.0s' {1..2000})"
+huge_uri="https://kakoune.org/$(printf 'a%.0s' {1..10000})"
+t 'keeps text after long OSC escapes' -in 'editor: \e]8;;'"$long_uri"'\e\\kakoune\e]8;;\e\\ rocks' -out 'editor: kakoune rocks'
+t 'keeps text after OSC escapes too long to process' -in 'editor: \e]8;;'"$huge_uri"'\e\\kakoune\e]8;;\e\\ rocks' -out 'editor: kakoune rocks'
 
 h2 "Common Private Modes"
 t 'ignores common private modes escapes' -in 'hello\e[?47hworld' -out 'helloworld'

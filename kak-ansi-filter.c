@@ -76,8 +76,12 @@ Coord   current_coord       = { .line = 1, .column = 1 };
 Coord   previous_char_end   = { .line = 1, .column = 0 };
 Coord   face_start_coord    = { .line = 1, .column = 1 };
 bool    in_G1_character_set = false;
-wchar_t escape_sequence[1024];
+#define ESCAPE_SEQUENCE_MAX 8192
+
+wchar_t escape_sequence[ESCAPE_SEQUENCE_MAX];
 int     escape_sequence_length = 0;
+bool    escape_sequence_overflowed = false;
+wchar_t escape_sequence_last_char = L'\0';
 
 void reset(void)
 {
@@ -278,8 +282,12 @@ void process_escape_sequence(wchar_t* seq)
 
 void add_escape_char(wchar_t ch)
 {
-    if (escape_sequence_length >= 1020)
+    escape_sequence_last_char = ch;
+    if (escape_sequence_length >= ESCAPE_SEQUENCE_MAX - 1)
+    {
+        escape_sequence_overflowed = true;
         return;
+    }
     escape_sequence[escape_sequence_length++] = ch;
     escape_sequence[escape_sequence_length] = L'\0';
 }
@@ -324,7 +332,7 @@ wchar_t handle_escape_char(wchar_t ch)
         {
         case L']':
             /* OSC escapes, used by shell integration */
-            if ((ch != L'\\' || escape_sequence[escape_sequence_length-1] != 0x1b) && ch != 0x07)
+            if ((ch != L'\\' || escape_sequence_last_char != 0x1b) && ch != 0x07)
             {
                 add_escape_char(ch);
                 return WEOF;
@@ -349,8 +357,10 @@ wchar_t handle_escape_char(wchar_t ch)
     if (escape_sequence_length > 1)
     {
         add_escape_char(ch);
-        process_escape_sequence(escape_sequence);
+        if (!escape_sequence_overflowed)
+            process_escape_sequence(escape_sequence);
         escape_sequence_length = 0;
+        escape_sequence_overflowed = false;
         return WEOF;
     }
     return ch;
