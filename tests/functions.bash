@@ -3,6 +3,7 @@ TESTS_FAILED=0
 TEST_OK=true
 TEST_OUTPUT=''
 TEST_RANGES=()
+TEST_LINKS=()
 
 h2() {
     printf '\n \e[33;1m%s\e[0m\n' "$1"
@@ -15,6 +16,7 @@ h3() {
 hasGlob() {
     local pattern="$1"
     shift
+    pattern="${pattern//\\/\\\\}"
     pattern="${pattern//\./\\.}"
     pattern="${pattern//\*/.*}"
     pattern="${pattern//\|/\\|}"
@@ -41,7 +43,22 @@ fail() {
     printf '      Assertion: \e[31m%s\e[0m\n' "$*"
     printf "         Output: '%s'\n" "$escaped_out"
     printf "         Ranges: %s\n" "${TEST_RANGES[*]}"
+    printf "          Links: %s\n" "${TEST_LINKS[*]}"
     printf '\n'
+}
+
+expectWords() {
+    local flag="$1" name="$2"
+    local -n expected_words="$3" actual_words="$4"
+    local pattern
+    for pattern in "${expected_words[@]}"; do
+        if ! hasGlob "$pattern" "${actual_words[@]}"; then
+            fail "$flag" "$pattern"
+        fi
+    done
+    if (( ${#actual_words[@]} != ${#expected_words[@]} )); then
+        fail "count of $name"
+    fi
 }
 
 t() {
@@ -64,10 +81,15 @@ t() {
     printf '     %s ... ' "$description"
     local commands_file=$(mktemp)
     TEST_OUT=$(printf "$in" | ./kak-ansi-filter $flags 2>"$commands_file")
-    local command_words
-    read -ra command_words <"$commands_file"
+    local command_words link_words
+    {
+        read -ra command_words
+        read -ra link_words
+    } <"$commands_file"
     TEST_RANGES=( "${command_words[@]:4}" )
-    local ranges_specified=false range_count=0
+    TEST_LINKS=( "${link_words[@]:4}" )
+    local ranges_specified=false expected_ranges=()
+    local links_specified=false expected_links=()
     TEST_OK=true
 
     while (( $# > 0 )); do
@@ -80,14 +102,20 @@ t() {
             ;;
         -range)
             ranges_specified=true
-            range_count=$(( range_count + 1 ))
-            if ! hasGlob "$2" "${TEST_RANGES[@]}"; then
-                fail "$1" "$2"
-            fi
+            expected_ranges+=( "$2" )
             shift 2
             ;;
         -no-ranges)
             ranges_specified=true
+            shift
+            ;;
+        -link)
+            links_specified=true
+            expected_links+=( "$2" )
+            shift 2
+            ;;
+        -no-links)
+            links_specified=true
             shift
             ;;
         *)
@@ -98,9 +126,10 @@ t() {
     done
 
     if $ranges_specified; then
-        if (( ${#TEST_RANGES[@]} != range_count )); then
-            fail 'count of ranges'
-        fi
+        expectWords -range ranges expected_ranges TEST_RANGES
+    fi
+    if $links_specified; then
+        expectWords -link links expected_links TEST_LINKS
     fi
 
     TEST_COUNT=$(( TEST_COUNT + 1 ))

@@ -1,4 +1,8 @@
 declare-option -hidden range-specs ansi_color_ranges
+declare-option -docstring %{ranges of OSC 8 hyperlinks, each with its URI
+
+Kakoune escapes '\' and '|' in the URIs with a backslash.} \
+    range-specs ansi_hyperlink_ranges
 declare-option -hidden str ansi_command_file
 declare-option -hidden str ansi_filter %sh{
     filterdir="$(dirname $kak_source)/.."
@@ -26,6 +30,7 @@ are removed.} \
 define-command -hidden ansi-setup-buffer %{
     add-highlighter buffer/ansi ranges ansi_color_ranges
     set-option buffer ansi_color_ranges %val{timestamp}
+    set-option buffer ansi_hyperlink_ranges %val{timestamp}
     set-option buffer ansi_command_file %sh{mktemp}
     hook -always -once buffer BufClose .* %{
 	    nop %sh{rm ${kak_opt_ansi_command_file}}
@@ -38,6 +43,7 @@ define-command -hidden ansi-render-selection-impl %{
         set-register '|' "%opt{ansi_filter} -range %val{selection_desc} 2>%opt{ansi_command_file}"
         execute-keys "|<ret>"
         update-option buffer ansi_color_ranges
+        update-option buffer ansi_hyperlink_ranges
         source "%opt{ansi_command_file}"
         trigger-user-hook "AnsiColored=%val(selection_desc)"
     }

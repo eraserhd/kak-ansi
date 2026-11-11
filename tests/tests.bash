@@ -91,13 +91,28 @@ h3 "Other Overstrikes"
 t 'are discarded' -in 'X\bY' -out 'Y'
 
 h2 "Shell Integration"
-t 'ignores hyperlinks' -in 'editor: \e]8;;https://kakoune.org/\e\\kakoune\e]8;;\e\\' -out 'editor: kakoune'
-t 'ignores hyperlinks terminated by BEL' -in 'editor: \e]8;;https://kakoune.org/\akakoune\e]8;;\a' -out 'editor: kakoune'
+t 'removes hyperlink escapes' -in 'editor: \e]8;;https://kakoune.org/\e\\kakoune\e]8;;\e\\' -out 'editor: kakoune'
+t 'removes hyperlink escapes terminated by BEL' -in 'editor: \e]8;;https://kakoune.org/\akakoune\e]8;;\a' -out 'editor: kakoune'
 t 'ignores shell integration esapes' -in 'hello\e]133;A\e\\world' -out 'helloworld'
 long_uri="https://kakoune.org/$(printf 'a%.0s' {1..2000})"
 huge_uri="https://kakoune.org/$(printf 'a%.0s' {1..10000})"
 t 'keeps text after long OSC escapes' -in 'editor: \e]8;;'"$long_uri"'\e\\kakoune\e]8;;\e\\ rocks' -out 'editor: kakoune rocks'
 t 'keeps text after OSC escapes too long to process' -in 'editor: \e]8;;'"$huge_uri"'\e\\kakoune\e]8;;\e\\ rocks' -out 'editor: kakoune rocks'
+
+h2 "Hyperlinks"
+t 'records hyperlinked text' -in 'editor: \e]8;;https://kakoune.org/\e\\kakoune\e]8;;\e\\' -link "'1.9,1.15|https://kakoune.org/'"
+t 'records hyperlinks terminated by BEL' -in 'editor: \e]8;;https://kakoune.org/\akakoune\e]8;;\a' -link "'1.9,1.15|https://kakoune.org/'"
+t 'records hyperlinks with parameters' -in '\e]8;id=1:x=y;https://kakoune.org/\e\\kak\e]8;;\e\\' -link "'1.1,1.3|https://kakoune.org/'"
+t 'records long hyperlinks' -in '\e]8;;'"$long_uri"'\e\\kak\e]8;;\e\\' -link "'1.1,1.3|$long_uri'"
+t 'does not record hyperlinks without text' -in 'x\e]8;;https://kakoune.org/\e\\\e]8;;\e\\y' -no-links
+t 'records no hyperlinks for plain text' -in 'kakoune' -no-links
+t 'starting a hyperlink ends the previous one' -in '\e]8;;https://a.org/\e\\ab\e]8;;https://b.org/\e\\cd\e]8;;\e\\' -link "'1.1,1.2|https://a.org/'" -link "'1.3,1.4|https://b.org/'"
+t 'records hyperlinks left open at end of input' -in 'x\e]8;;https://kakoune.org/\e\\kak' -link "'1.2,1.4|https://kakoune.org/'"
+t 'records hyperlinks spanning lines' -in '\e]8;;https://kakoune.org/\e\\ab\ncd\e]8;;\e\\' -link "'1.1,2.2|https://kakoune.org/'"
+t 'does not count other escapes as hyperlinked text' -in '\e]8;;https://kakoune.org/\e\\a\e[31mb\e[0mc\e]8;;\e\\' -link "'1.1,1.3|https://kakoune.org/'" -range '1.2,1.2|red'
+t 'covers every byte of hyperlinked characters' -in '\e]8;;https://kakoune.org/\e\\é\e]8;;\e\\' -link "'1.1,1.2|https://kakoune.org/'"
+t 'offsets hyperlinks by the rendered range' -flags '-range 8.3,10.2' -in '\e]8;;https://kakoune.org/\e\\kak\e]8;;\e\\' -link "'8.3,8.5|https://kakoune.org/'"
+t 'quotes hyperlinks for Kakoune' -in "\e]8;;https://e.org/it's\\\\a|b\e\\\\x\e]8;;\e\\\\" -link "'1.1,1.1|https://e.org/it''s\\\\a\\|b'"
 
 h2 "Common Private Modes"
 t 'ignores common private modes escapes' -in 'hello\e[?47hworld' -out 'helloworld'

@@ -83,6 +83,18 @@ int     escape_sequence_length = 0;
 bool    escape_sequence_overflowed = false;
 wchar_t escape_sequence_last_char = L'\0';
 
+typedef struct {
+    Coord    start;
+    Coord    end;
+    wchar_t* uri;
+} Hyperlink;
+
+Hyperlink* hyperlinks              = NULL;
+size_t     hyperlink_count         = 0;
+size_t     hyperlink_capacity      = 0;
+wchar_t*   current_hyperlink_uri   = NULL;
+Coord      current_hyperlink_start = { .line = 1, .column = 1 };
+
 void reset(void)
 {
     current_face.foreground = DEFAULT;
@@ -268,12 +280,65 @@ void process_ansi_escape(wchar_t* seq)
         reset();
 }
 
+void end_hyperlink(void)
+{
+    if (current_hyperlink_uri == NULL)
+        return;
+    if (current_hyperlink_start.line != current_coord.line ||
+        current_hyperlink_start.column != current_coord.column)
+    {
+        if (hyperlink_count == hyperlink_capacity)
+        {
+            hyperlink_capacity = hyperlink_capacity ? 2 * hyperlink_capacity : 16;
+            hyperlinks = realloc(hyperlinks, hyperlink_capacity * sizeof(Hyperlink));
+            if (hyperlinks == NULL)
+            {
+                perror("realloc");
+                exit(1);
+            }
+        }
+        hyperlinks[hyperlink_count].start = current_hyperlink_start;
+        hyperlinks[hyperlink_count].end = previous_char_end;
+        hyperlinks[hyperlink_count].uri = current_hyperlink_uri;
+        ++hyperlink_count;
+    }
+    else
+        free(current_hyperlink_uri);
+    current_hyperlink_uri = NULL;
+}
+
+/* ESC ] 8 ; params ; URI ST, where an empty URI ends the link. */
+void process_hyperlink_escape(const wchar_t* seq)
+{
+    const wchar_t* uri = wcschr(seq + 4, L';');
+    if (uri == NULL)
+        return;
+    ++uri;
+    size_t length = wcslen(uri);
+    length -= uri[length-1] == 0x07 ? 1 : 2;
+
+    end_hyperlink();
+    if (length == 0)
+        return;
+    current_hyperlink_uri = malloc((length + 1) * sizeof(wchar_t));
+    if (current_hyperlink_uri == NULL)
+    {
+        perror("malloc");
+        exit(1);
+    }
+    wmemcpy(current_hyperlink_uri, uri, length);
+    current_hyperlink_uri[length] = L'\0';
+    current_hyperlink_start = current_coord;
+}
+
 void process_escape_sequence(wchar_t* seq)
 {
     if (wcslen(seq) < 2)
         return;
     if (seq[1] == L'[' && seq[wcslen(seq)-1] == 'm')
         process_ansi_escape(seq);
+    else if (!wcsncmp(seq, L"\x1B]8;", 4))
+        process_hyperlink_escape(seq);
     else if (!wcscmp(seq, L"\x1B(0"))
         in_G1_character_set = true;
     else if (!wcscmp(seq, L"\x1B(B"))
@@ -426,6 +491,30 @@ void display_char(wchar_t ch)
         current_coord.column += byte_count(ch);
 }
 
+void emit_hyperlinks(void)
+{
+    fwprintf(stderr, L"set-option -add buffer ansi_hyperlink_ranges");
+    for (size_t i = 0; i < hyperlink_count; i++)
+    {
+        fwprintf(stderr, L" '%d.%d,%d.%d|",
+                 hyperlinks[i].start.line, hyperlinks[i].start.column,
+                 hyperlinks[i].end.line, hyperlinks[i].end.column);
+        for (const wchar_t* p = hyperlinks[i].uri; *p; p++)
+        {
+            /* Kakoune unescapes \\ and \| in range-specs strings. */
+            switch (*p)
+            {
+            case L'\'': fputws(L"''", stderr);   break;
+            case L'\\': fputws(L"\\\\", stderr); break;
+            case L'|':  fputws(L"\\|", stderr);  break;
+            default:    fputwc(*p, stderr);      break;
+            }
+        }
+        fputwc(L'\'', stderr);
+    }
+    fwprintf(stderr, L"\n");
+}
+
 bool       overstricken_character_pending = false;
 bool       overstrike_want_attribute_reset = false;
 Attributes overstrike_previous_attributes;
@@ -528,5 +617,7 @@ int main(int argc, char* argv[])
     }
     emit_face(&current_face);
     fwprintf(stderr, L"\n");
+    end_hyperlink();
+    emit_hyperlinks();
     exit(0);
 }
